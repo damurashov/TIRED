@@ -1,14 +1,13 @@
 from setuptools import setup
 
 setup(
-    name="twoopt",
+    name="tired",
     packages=[
         "tired"
     ],
     include_package_data=True,
     license="MIT",
     description="Boilerplate I'm tired of writing over and over",
-    long_description="",
     author="Dmitry Murashov",
     setup_requires=["wheel"],
     install_requires=[
