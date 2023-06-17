@@ -13,6 +13,7 @@ setup(
     license="MIT",
     description="Boilerplate I'm tired of writing over and over",
     long_description=get_long_description(),
+    long_description_content_type="text/markdown",
     author="Dmitry Murashov",
     setup_requires=["wheel"],
     install_requires=[
