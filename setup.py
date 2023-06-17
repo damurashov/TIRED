@@ -14,6 +14,7 @@ setup(
     description="Boilerplate I'm tired of writing over and over",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
+    url="https://github.com/damurashov/TIRED",
     author="Dmitry Murashov",
     setup_requires=["wheel"],
     install_requires=[
