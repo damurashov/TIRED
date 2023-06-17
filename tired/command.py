@@ -6,7 +6,7 @@ def listout(l: list):
 	print('>', ' '.join(l))
 
 
-def command_output_piped(commands, verbose=False):
+def output_piped(commands, verbose=False):
 	"""
 	:param commands: commands to execute. The commands are executed in a sequential manner, i.e. piped
 	:return: console output, string
@@ -31,7 +31,7 @@ def command_output_piped(commands, verbose=False):
 	return out, p.returncode
 
 
-def command_output(cmd):
+def output(cmd):
 	print('>  ' + cmd)
 	ret = subprocess.run(split(cmd), stdout=subprocess.PIPE)
 
@@ -41,7 +41,7 @@ def command_output(cmd):
 	return ret.stdout.decode("unicode_escape").strip()
 
 
-def command_output_code(cmd):
+def output_code(cmd):
 	print('>  ' + cmd)
 	ret = subprocess.run(split(cmd), stdout=subprocess.PIPE)
 
