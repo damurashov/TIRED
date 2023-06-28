@@ -1,4 +1,4 @@
-def iterate_directory_content(directory: str):
+def get_directory_content(directory: str):
     """
     Iterate only through directory content
     """
@@ -9,7 +9,7 @@ def iterate_directory_content(directory: str):
     return content
 
 
-def iterate_directory_content_directories(directory: str):
+def get_directory_content_directories(directory: str):
     import os
 
     return filter(
