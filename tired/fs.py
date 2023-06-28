@@ -22,7 +22,5 @@ def get_directory_content_directories(directory: str, exclude_symbolic_links=Fal
 
         if os.path.isdir(absolute_path_string) \
                 and not (exclude_symbolic_links and os.path.islink(absolute_path_string)):
-            print('isdir', os.path.isdir(absolute_path_string))
-            print('islink', os.path.islink(absolute_path_string))
             yield item
 
