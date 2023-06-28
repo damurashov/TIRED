@@ -13,6 +13,6 @@ def get_directory_content_directories(directory: str, exclude_symbolic_links=Fal
     import os
 
     return filter(
-        lambda item: os.path.isdir(item) && not (exclude_symbolic_links && os.path.islink(item)),
+        lambda item: os.path.isdir(item) and not (exclude_symbolic_links and os.path.islink(item)),
         get_directory_content(directory)
     )
