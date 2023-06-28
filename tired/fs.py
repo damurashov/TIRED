@@ -13,8 +13,16 @@ def get_directory_content(directory: str):
 
 def get_directory_content_directories(directory: str, exclude_symbolic_links=False):
     import os
+    import pathlib
 
-    return filter(
-        lambda item: os.path.isdir(item) and not (exclude_symbolic_links and os.path.islink(item)),
-        get_directory_content(directory)
-    )
+    directory_path_object = pathlib.Path(directory).resolve()
+
+    for item in get_directory_content(directory):
+        absolute_path_string = str(directory_path_object / item)
+
+        if os.path.isdir(absolute_path_string) \
+                and not (exclude_symbolic_links and os.path.islink(absolute_path_string)):
+            print('isdir', os.path.isdir(absolute_path_string))
+            print('islink', os.path.islink(absolute_path_string))
+            yield item
+
