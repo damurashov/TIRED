@@ -9,10 +9,10 @@ def get_directory_content(directory: str):
     return content
 
 
-def get_directory_content_directories(directory: str):
+def get_directory_content_directories(directory: str, exclude_symbolic_links=False):
     import os
 
     return filter(
-        lambda item: os.path.isdir(item),
+        lambda item: os.path.isdir(item) && not (exclude_symbolic_links && os.path.islink(item)),
         get_directory_content(directory)
     )
