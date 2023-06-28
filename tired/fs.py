@@ -3,8 +3,10 @@ def get_directory_content(directory: str):
     Iterate only through directory content
     """
     import os
+    import pathlib
 
-    content = os.listdir(directory)
+    real_path = pathlib.Path(directory).resolve()
+    content = os.listdir(str(real_path))
 
     return content
 
