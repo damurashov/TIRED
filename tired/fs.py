@@ -12,6 +12,9 @@ def get_directory_content(directory: str):
 
 
 def get_directory_content_directories(directory: str, exclude_symbolic_links=False):
+    """
+    List-out everything but directories
+    """
     import os
     import pathlib
 
