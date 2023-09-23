@@ -1,8 +1,10 @@
 #!/usr/bin/bash
 
+PYTHON=python3.9
+
 cd ..  \
-	&& python3 -m pip install build twine \
+	&& $PYTHON -m pip install build twine \
 	&& rm -rf dist \
-	&& python3 -m build \
-	&& python3 -m twine upload dist/*  --verbose
+	&& $PYTHON -m build \
+	&& $PYTHON -m twine upload dist/*  --verbose
 
