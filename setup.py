@@ -18,7 +18,8 @@ setup(
     author="Dmitry Murashov",
     setup_requires=["wheel"],
     install_requires=[
-        "simple_term_menu"
+        "simple_term_menu",
+	"datetime",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
