@@ -1,9 +1,14 @@
 import subprocess
 from shlex import split
+import tired.logging
+
+
+_CONTEXT = "tired.command"
 
 
 def listout(l: list):
-	print('>', ' '.join(l))
+	command_string = '> ' + ' '.join(l)
+	tired.logging.debug(_CONTEXT, f"Executing command `{command_string}`")
 
 
 def get_output_piped(commands, verbose=False):
@@ -18,7 +23,7 @@ def get_output_piped(commands, verbose=False):
 	p = subprocess.Popen(commands[0], stdout=subprocess.PIPE)
 
 	for c in commands[1:]:
-		print("  ↑ piped into ↓")
+		tired.logging.debug(_CONTEXT, "  ↑ piped into ↓")
 		listout(c)
 		p = subprocess.Popen(c, stdout=subprocess.PIPE, stdin=p.stdout)
 
@@ -32,7 +37,7 @@ def get_output_piped(commands, verbose=False):
 
 
 def get_output(cmd):
-	print('>  ' + cmd)
+	tired.logging.debug(_CONTEXT, "Executing command " + '>  `' + cmd + '`')
 	ret = subprocess.run(split(cmd), stdout=subprocess.PIPE)
 
 	if ret.returncode != 0:
@@ -42,14 +47,14 @@ def get_output(cmd):
 
 
 def get_output_with_code(cmd):
-	print('>  ' + cmd)
+	tired.logging.debug(_CONTEXT, "Executing command " + '>  `' + cmd + '`')
 	ret = subprocess.run(split(cmd), stdout=subprocess.PIPE)
 
 	return ret.stdout.decode("unicode_escape").strip(), ret.returncode
 
 
 def execute(cmd):
-	print('>  ' + cmd)
+	tired.logging.debug(_CONTEXT, "Executing command " + '>  `' + cmd + '`')
 	ret = subprocess.run(split(cmd))
 
 	if ret.returncode != 0:
