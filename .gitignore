@@ -9,3 +9,4 @@ test/test_linsmat_ga_gene_virt.csv
 *.tempmsg
 dist/
 tired.egg-info
+*.swp
