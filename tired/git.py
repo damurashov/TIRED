@@ -1,6 +1,19 @@
+import tired.command
+import tired.logging
+
+_LOG_CONTEXT = "tired.command"
+
+
 def get_current_branch_name():
-    # TODO
-    pass
+    command_string = "git rev-parse --abbrev-ref HEAD"
+    output, code = tired.command.get_output_with_code(command_string)
+
+    if code != 0:
+        tired.logging.error(_LOG_CONTEXT, f"Failed to execute command `{command_string}`")
+
+        raise Exception(f"Failed to execute command `{command_string}`, returned {code}")
+
+    return output
 
 
 def get_current_branch_hash():
