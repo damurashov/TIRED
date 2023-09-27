@@ -13,12 +13,19 @@ def get_current_branch_name():
 
         raise Exception(f"Failed to execute command `{command_string}`, returned {code}")
 
-    return output
+    return output.strip()
 
 
 def get_current_branch_hash():
-    # TODO
-    pass
+    command_string = "git rev-parse HEAD"
+    output, code = tired.command.get_output_with_code(command_string)
+
+    if code != 0:
+        tired.logging.error(_LOG_CONTEXT, f"Failed to execute command `{command_string}`")
+
+        raise Exception(f"Failed to execute command `{command_string}`, returned {code}")
+
+    return output.strip()
 
 
 def get_remote_repository_name(remote_tag="origin"):
