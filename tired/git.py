@@ -16,7 +16,7 @@ def get_current_branch_name():
     return output.strip()
 
 
-def get_current_branch_hash():
+def get_current_commit_hash():
     command_string = "git rev-parse HEAD"
     output, code = tired.command.get_output_with_code(command_string)
 
