@@ -1,3 +1,6 @@
+import inspect
+
+
 def module_file_as_module_object(module_file):
     """
     Example:
@@ -16,7 +19,7 @@ def get_module_functions(module_object):
     pass
 
 
-def get_current_context_string():
+def get_stack_context_string(caller_stack_level=1):
     """
     Builds the caller's context using instrospection based on "inspect". The
     format is this:
@@ -41,4 +44,9 @@ def get_current_context_string():
 
     """
     # TODO
-    pass
+    stack = inspect.stack()
+    caller_frame = stack[caller_stack_level]
+    qual_name = caller_frame[0].f_code.co_qualname
+    module_name = inspect.getmodule(caller_frame[0]).__name__
+
+    return f"{module_name}.{qual_name}"
