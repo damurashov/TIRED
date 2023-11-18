@@ -1,5 +1,6 @@
 import tired
 import tired.datetime
+import tired.meta
 
 
 _LOG_SECTION_DELIMETER = "-"
@@ -15,22 +16,25 @@ LOG_LEVEL_TO_STRING_MAPPING = {
     DEBUG: "D"
 }
 
-def _log_impl(context, message, level):
-    print(LOG_LEVEL_TO_STRING_MAPPING[level], _LOG_SECTION_DELIMETER,
-        f"{tired.datetime.get_today_time_milliseconds_string()}", f"[{context}]", _LOG_SECTION_DELIMETER, message)
+def _log_impl(level, *args):
+    context = tired.meta.get_stack_context_string(3)
+    message = ' '.join(args)
+    output = ' '.join([LOG_LEVEL_TO_STRING_MAPPING[level], _LOG_SECTION_DELIMETER,
+        f"{tired.datetime.get_today_time_milliseconds_string()}", f"[{context}]", _LOG_SECTION_DELIMETER, message])
+    print(output)
 
 
-def debug(context, message):
-    _log_impl(context, message, DEBUG)
+def debug(*args):
+    _log_impl(DEBUG, *args)
 
 
-def error(context, message):
-    _log_impl(context, message, ERROR)
+def error(*args):
+    _log_impl(ERROR, *args)
 
 
-def info(context, message):
-    _log_impl(context, message, INFO)
+def info(*args):
+    _log_impl(INFO, *args)
 
 
-def warning(context, message):
-    _log_impl(context, message, DEBUG)
+def warning(*args):
+    _log_impl(DEBUG, *args)
