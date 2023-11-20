@@ -34,11 +34,11 @@ class FileSelectionWidget(tkinter.Frame):
 
 
 class LabeledSpinbox(tkinter.Frame):
-    def __init__(self, parent, title, textvariable, *args, **kwargs):
+    def __init__(self, parent, title, textvariable, *args, from_=1, to=10, **kwargs):
         # TODO: save value variable in "self"
         tkinter.Frame.__init__(self, parent)
         self.label = tkinter.Label(self, text=title, width=DEFAULT_LABEL_WIDTH, anchor='w')
-        self.spinbox = tkinter.Spinbox(self, *args, textvariable=textvariable, **kwargs)
+        self.spinbox = tkinter.Spinbox(self, *args, textvariable=textvariable, from_=from_, to=to, **kwargs)
         self.label.grid(row=0, column=0, sticky='nsew')
         self.spinbox.grid(row=0, column=1, sticky='nsew')
 
