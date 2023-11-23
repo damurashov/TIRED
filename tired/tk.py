@@ -52,3 +52,37 @@ class LabeledOptionsMenu(tkinter.Frame):
         self.option_menu = tkinter.OptionMenu(self, targetvar, *args, **kwargs)
         self.label.grid(row=0, column=0, sticky='nsew')
         self.option_menu.grid(row=0, column=1, sticky='nsew')
+
+
+class Frame(tkinter.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        tkinter.Frame.__init__(self, parent, *args, **kwargs)
+        self._tk_variables_map = dict()
+        self._file_dialog_map = dict()
+        self._checkbox_map = dict()
+        self._checkbox_map = dict()
+        self._button_map = dict()
+
+    def _count_widgets(self):
+        return len(root.grid_slaves())
+
+    def add_checkbox(self, string_identifier: str):
+        """
+        Adds a checkbox onto pane. String identifier is used as title
+        """
+        pass
+
+    def add_file_dialog(self, string_identifier: str):
+        """
+        Adds file dialog onto plane.
+        """
+        pass
+
+    def add_spinbox(self, string_identifier: str, file_types, min: float, max: float, step: float = 1.0):
+        """
+        Adds spinbox onto plane
+        """
+        pass
+
+    def add_button(self, string_identifier: str):
+        pass
