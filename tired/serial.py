@@ -40,3 +40,7 @@ class SerialStream:
 
     def write(self, data):
         self.socket.write(data)
+
+
+def get_all_serial_devices():
+    return serial.tools.list_ports()
