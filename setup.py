@@ -19,7 +19,8 @@ setup(
     setup_requires=["wheel"],
     install_requires=[
         "simple_term_menu",
-	"datetime",
+        "datetime",
+        "pyserial"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
