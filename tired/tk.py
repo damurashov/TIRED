@@ -5,12 +5,14 @@ applications in the most efficient way
 
 # TODO: add interface for easily building simple GUIs with checkboxes, tabs, file selection dialogs, drop-down selections, menus, and buttons
 
+from tkinter import ttk
+import threading
 import tired.logging
 import tkinter
-from tkinter import ttk
 
 
 DEFAULT_LABEL_WIDTH = 25
+
 
 class FileSelectionWidget(tkinter.Frame):
 
@@ -176,9 +178,33 @@ class Tabs(ttk.Notebook):
         ttk.Notebook.__init__(self, *args, **kwargs)
         self._frame_map = dict()
 
-    def is_widget_registered(self, widget_string_identifier: str):
+    def _is_widget_registered(self, widget_string_identifier: str):
         return widget_string_identifier in self._frame_map.keys()
 
     def add_frame(self, string_identifier):
+        if self._is_widget_registered(string_identifier):
+            raise KeyError(f"A widget with the name \"{string_identifier}\" already exists")
+
         widget = Frame(self)
         self.add(widget, text=string_identifier)
+
+        return widget
+
+
+class Window(tkinter.Tk):
+    def __init__(self, *args, **kwargs):
+        tkinter.Tk.__init__(self, *args, **kwargs)
+        self._root_frame = Frame(self)
+        self._root_frame.pack(expand=True, fill='both')
+
+    def _is_widget_registered(self, widget_string_identifier: str):
+        return widget_string_identifier in self._frame_map.keys() or widget_string_identifier in self._tabs_map.keys()
+
+    def add_frame(self, string_identifier: str):
+        return self._root_frame.add_frame(string_identifier)
+
+    def add_tabs(self, string_identifier: str):
+        return self._root_frame.add_tabs(string_identifier)
+
+    def run(self):
+        self.mainloop()
