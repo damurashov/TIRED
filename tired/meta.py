@@ -50,7 +50,7 @@ def get_stack_context_string(caller_stack_level=1):
     try:
         qual_name = caller_frame[0].f_code.co_qualname
     except AttributeError:
-        qual_name = ""
+        qual_name = caller_frame[0].f_code.co_name
 
     module_name = inspect.getmodule(caller_frame[0]).__name__
 
