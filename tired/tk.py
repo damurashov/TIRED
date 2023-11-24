@@ -126,7 +126,7 @@ class Frame(tkinter.Frame):
         self._spinbox_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
 
-    def add_button(self, string_identifier, callback=lambda e: None):
+    def add_button(self, string_identifier, callback=lambda: None):
         """
         Adds a simple button
         """
