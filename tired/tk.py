@@ -166,6 +166,7 @@ class Frame(tkinter.Frame):
 
         widget = Frame(self)
         self._frame_map[string_identifier] = widget
+        self._placement_strategy.place_widget(self, widget)
 
         return widget
 
