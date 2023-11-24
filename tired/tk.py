@@ -71,12 +71,14 @@ class Frame(tkinter.Frame):
         self._checkbox_map = dict()
         self._button_map = dict()
         self._spinbox_map = dict()
+        self._tabs_map = dict()
+        self._frame_map = dict()
 
         # Defines how widgets should be arranged on a pane
         self._placement_strategy = GridPlacementStrategy()
 
     def _is_widget_registered(self, widget_name):
-        return widget_name in self._tk_variables_map.keys()
+        return widget_name in self._tk_variables_map.keys() or widget_name in self._tabs_map.keys() or widget_name in self._frame_map.keys()
 
     def add_checkbox(self, string_identifier: str, default_value=False):
         """
@@ -146,10 +148,36 @@ class Frame(tkinter.Frame):
 
         return widget
 
-    def add_tabs(self, tabs):
-        pass
+    def add_tabs(self, string_identifier):
+        from tired.tk import Tabs
+
+        if self._is_widget_registered(string_identifier):
+            raise KeyError(f"A widget with the name \"{string_identifier}\" already exists")
+
+        widget = Tabs(self)
+        self._placement_strategy.place_widget(self, widget)
+        self._tabs_map[string_identifier] = widget
+
+        return widget
+
+    def add_frame(self, string_identifier):
+        if self._is_widget_registered(string_identifier):
+            raise KeyError(f"A widget with the name \"{string_identifier}\" already exists")
+
+        widget = Frame(self)
+        self._frame_map[string_identifier] = widget
+
+        return widget
 
 
 class Tabs(ttk.Notebook):
-    def add_frame(self, frame):
-        self.add(frame)
+    def __init__(self, *args, **kwargs):
+        ttk.Notebook.__init__(self, *args, **kwargs)
+        self._frame_map = dict()
+
+    def is_widget_registered(self, widget_string_identifier: str):
+        return widget_string_identifier in self._frame_map.keys()
+
+    def add_frame(self, string_identifier):
+        widget = Frame(self)
+        self.add(widget, text=string_identifier)
