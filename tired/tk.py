@@ -136,6 +136,3 @@ class Frame(tkinter.Frame):
         widget = tkinter.Button(self, text=string_identifier, command=callback)
         self._button_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
-
-    def add_button(self, string_identifier: str):
-        pass
