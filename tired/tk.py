@@ -124,5 +124,16 @@ class Frame(tkinter.Frame):
         self._spinbox_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
 
+    def add_button(self, string_identifier, callback=lambda e: None):
+        """
+        Adds a simple button
+        """
+        if self._is_widget_registered(string_identifier):
+            raise KeyError(f"A widget with the name \"{string_identifier}\" already exists")
+
+        widget = tkinter.Button(self, text=string_identifier, command=callback)
+        self._button_map[string_identifier] = widget
+        self._placement_strategy.place_widget(self, widget)
+
     def add_button(self, string_identifier: str):
         pass
