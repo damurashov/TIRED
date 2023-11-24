@@ -91,6 +91,8 @@ class Frame(tkinter.Frame):
         self._checkbox_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
 
+        return widget
+
     def set_widget_value(self, widget_string_identifier: str, value: object):
         """
         Sets value to a variable corresponding to a widget selected
@@ -113,6 +115,8 @@ class Frame(tkinter.Frame):
         self._file_dialog_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
 
+        return widget
+
     def add_spinbox(self, string_identifier: str, min: float, max: float, step: float = 1.0):
         """
         Adds spinbox onto plane.
@@ -127,6 +131,8 @@ class Frame(tkinter.Frame):
         self._spinbox_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
 
+        return widget
+
     def add_button(self, string_identifier, callback=lambda: None):
         """
         Adds a simple button
@@ -137,6 +143,8 @@ class Frame(tkinter.Frame):
         widget = tkinter.Button(self, text=string_identifier, command=callback)
         self._button_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
+
+        return widget
 
     def add_tabs(self, tabs):
         pass
