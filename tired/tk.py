@@ -5,6 +5,7 @@ applications in the most efficient way
 
 # TODO: add interface for easily building simple GUIs with checkboxes, tabs, file selection dialogs, drop-down selections, menus, and buttons
 
+import tired.logging
 import tkinter
 
 
@@ -57,6 +58,7 @@ class LabeledOptionsMenu(tkinter.Frame):
 class GridPlacementStrategy:
     def place_widget(self, parent: tkinter.Widget, widget: tkinter.Widget):
         nrow = len(parent.grid_slaves())
+        tired.logging.debug(f"Adding widget {widget.__class__.__name__} at row {nrow}")
         widget.grid(row=nrow, column=0, sticky='w')
 
 
