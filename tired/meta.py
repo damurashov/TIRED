@@ -46,7 +46,12 @@ def get_stack_context_string(caller_stack_level=1):
     # TODO
     stack = inspect.stack()
     caller_frame = stack[caller_stack_level]
-    qual_name = caller_frame[0].f_code.co_qualname
+
+    try:
+        qual_name = caller_frame[0].f_code.co_qualname
+    except AttributeError:
+        qual_name = ""
+
     module_name = inspect.getmodule(caller_frame[0]).__name__
 
     return f"{module_name}.{qual_name}"
