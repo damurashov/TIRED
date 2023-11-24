@@ -96,11 +96,18 @@ class Frame(tkinter.Frame):
 
         self._tk_variables_map[widget_string_identifier].set(value)
 
-    def add_file_dialog(self, string_identifier: str):
+    def add_file_selection(self, string_identifier: str, file_types=('*.*', )):
         """
         Adds file dialog onto plane.
         """
-        pass
+        if self._is_widget_registered(string_identifier):
+            raise KeyError(f"A widget with the name \"{string_identifier}\" already exists")
+
+        variable = tkinter.StringVar()
+        self._tk_variables_map[string_identifier] = variable
+        widget = FileSelectionWidget(self, string_identifier, variable, True, file_types)
+        self._file_dialog_map[string_identifier] = widget
+        self._placement_strategy.place_widget(self, widget)
 
     def add_spinbox(self, string_identifier: str, file_types, min: float, max: float, step: float = 1.0):
         """
