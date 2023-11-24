@@ -34,11 +34,11 @@ class FileSelectionWidget(tkinter.Frame):
 
 
 class LabeledSpinbox(tkinter.Frame):
-    def __init__(self, parent, title, textvariable, from_=1, to=10, *args, **kwargs):
+    def __init__(self, parent, title, textvariable, from_=1.0, to=10.0, increment=1.0, *args, **kwargs):
         # TODO: save value variable in "self"
         tkinter.Frame.__init__(self, parent)
         self.label = tkinter.Label(self, text=title, width=DEFAULT_LABEL_WIDTH, anchor='w')
-        self.spinbox = tkinter.Spinbox(self, *args, textvariable=textvariable, from_=from_, to=to, **kwargs)
+        self.spinbox = tkinter.Spinbox(self, *args, textvariable=textvariable, from_=from_, to=to, increment=increment, **kwargs)
         self.label.grid(row=0, column=0, sticky='nsew')
         self.spinbox.grid(row=0, column=1, sticky='nsew')
 
@@ -67,6 +67,7 @@ class Frame(tkinter.Frame):
         self._file_dialog_map = dict()
         self._checkbox_map = dict()
         self._button_map = dict()
+        self._spinbox_map = dict()
 
         # Defines how widgets should be arranged on a pane
         self._placement_strategy = GridPlacementStrategy()
@@ -109,11 +110,19 @@ class Frame(tkinter.Frame):
         self._file_dialog_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
 
-    def add_spinbox(self, string_identifier: str, file_types, min: float, max: float, step: float = 1.0):
+    def add_spinbox(self, string_identifier: str, min: float, max: float, step: float = 1.0):
         """
-        Adds spinbox onto plane
+        Adds spinbox onto plane.
+        post: The value type for spinbox is `double`
         """
-        pass
+        if self._is_widget_registered(string_identifier):
+            raise KeyError(f"A widget with the name \"{string_identifier}\" already exists")
+
+        variable = tkinter.DoubleVar()
+        self._tk_variables_map[string_identifier] = variable
+        widget = LabeledSpinbox(self, string_identifier, variable, min, max, step)
+        self._spinbox_map[string_identifier] = widget
+        self._placement_strategy.place_widget(self, widget)
 
     def add_button(self, string_identifier: str):
         pass
