@@ -7,6 +7,7 @@ applications in the most efficient way
 
 import tired.logging
 import tkinter
+from tkinter import ttk
 
 
 DEFAULT_LABEL_WIDTH = 25
@@ -136,3 +137,11 @@ class Frame(tkinter.Frame):
         widget = tkinter.Button(self, text=string_identifier, command=callback)
         self._button_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
+
+    def add_tabs(self, tabs):
+        pass
+
+
+class Tabs(ttk.Notebook):
+    def add_frame(self, frame):
+        self.add(frame)
