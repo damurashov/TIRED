@@ -57,6 +57,7 @@ class LabeledOptionsMenu(tkinter.Frame):
 class GridPlacementStrategy:
     def place_widget(self, parent: tkinter.Widget, widget: tkinter.Widget):
         nrow = len(parent.grid_slaves())
+        widget.grid(row=nrow, column=0, sticky='w')
 
 
 class Frame(tkinter.Frame):
@@ -82,7 +83,7 @@ class Frame(tkinter.Frame):
 
         variable = tkinter.BooleanVar()
         self._tk_variables_map[string_identifier] = variable
-        widget = tkinter.CheckButton(self, text=string_identifier, variable=variable)
+        widget = tkinter.Checkbutton(self, text=string_identifier, variable=variable)
         self._checkbox_map[string_identifier] = widget
         self._placement_strategy.place_widget(self, widget)
 
