@@ -54,6 +54,11 @@ class LabeledOptionsMenu(tkinter.Frame):
         self.option_menu.grid(row=0, column=1, sticky='nsew')
 
 
+class GridPlacementStrategy:
+    def place_widget(self, parent: tkinter.Widget, widget: tkinter.Widget):
+        nrow = len(parent.grid_slaves())
+
+
 class Frame(tkinter.Frame):
     def __init__(self, parent, *args, **kwargs):
         tkinter.Frame.__init__(self, parent, *args, **kwargs)
@@ -62,18 +67,11 @@ class Frame(tkinter.Frame):
         self._checkbox_map = dict()
         self._button_map = dict()
 
-    def _count_widgets(self):
-        return len(self.grid_slaves())
+        # Defines how widgets should be arranged on a pane
+        self._placement_strategy = GridPlacementStrategy()
 
     def _is_widget_registered(self, widget_name):
         return widget_name in self._tk_variables_map.keys()
-
-    def _autoplace_widget(self, widget: tkinter.Widget):
-        """
-        pre: widget's parent should be assigned to self
-        """
-        nrow = self._count_widgets()
-        widget.grid(row=nrow, column=0)
 
     def add_checkbox(self, string_identifier: str, default_value=False):
         """
@@ -86,6 +84,7 @@ class Frame(tkinter.Frame):
         self._tk_variables_map[string_identifier] = variable
         widget = tkinter.CheckButton(self, text=string_identifier, variable=variable)
         self._checkbox_map[string_identifier] = widget
+        self._placement_strategy.place_widget(self, widget)
 
     def set_widget_value(self, widget_string_identifier: str, value: object):
         """
