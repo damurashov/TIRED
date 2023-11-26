@@ -30,6 +30,11 @@ def get_current_commit_hash():
     return output.strip()
 
 
+def get_remote_repository_name(remote_tag="origin"):
+    # TODO
+    pass
+
+
 def get_staged_file_names():
     command_string = "git diff --name-only --staged"
     output, code = tired.command.get_output_with_code(command_string)
@@ -44,6 +49,3 @@ def get_staged_file_names():
     return tired.parse.iterate_string_multiline(output)
 
 
-def get_remote_repository_name(remote_tag="origin"):
-    # TODO
-    pass
