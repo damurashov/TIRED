@@ -21,4 +21,4 @@ def get_input_using_temporary_file(file_path=".tmp", editor="vim", initial_messa
     tired.command.execute(f"{editor} {file_path}")
 
     with open(file_path, 'r') as f:
-        return r.read()
+        return f.read()
