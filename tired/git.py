@@ -35,6 +35,10 @@ def get_remote_repository_name(remote_tag="origin"):
     pass
 
 
+def shitty_method_test():
+    pass
+
+
 def get_staged_file_paths():
     command_string = "git diff --name-only --staged"
     output, code = tired.command.get_output_with_code(command_string)
