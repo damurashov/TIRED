@@ -47,5 +47,3 @@ def get_staged_file_names():
     output = output.strip()
 
     return tired.parse.iterate_string_multiline(output)
-
-
