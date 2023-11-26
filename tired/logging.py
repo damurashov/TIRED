@@ -37,4 +37,4 @@ def info(*args):
 
 
 def warning(*args):
-    _log_impl(DEBUG, *args)
+    _log_impl(WARNING, *args)
