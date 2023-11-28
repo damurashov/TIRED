@@ -52,4 +52,14 @@ def get_git_directory_from_nested_context():
     """
     TODO: git rev-parse --show-toplevel
     """
-    pass
+    command_string = f"git rev-parse --show-toplevel"
+    output, code = tired.command.get_output_with_code(command_string)
+
+    if code != 0:
+        tired.logging.error(f"Failed to execute command `{command_string}`")
+
+        raise Exception(f"Failed to execute command `{command_string}`, returned {code}")
+
+    output = output.strip()
+
+    return output
