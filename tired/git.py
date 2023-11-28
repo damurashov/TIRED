@@ -30,8 +30,12 @@ def get_current_commit_hash():
     return output.strip()
 
 
-def get_staged_file_paths():
-    command_string = "git diff --name-only --staged"
+def get_staged_file_paths(use_relative_paths=False):
+    """
+    @param use_relative_paths. If true, the returned paths will be relative to PWD
+    """
+    relative_flag = "--relative" if use_relative_path else ""
+    command_string = f"git diff --name-only --staged {relative_flag}"
     output, code = tired.command.get_output_with_code(command_string)
 
     if code != 0:
