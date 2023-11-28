@@ -46,3 +46,10 @@ def get_staged_file_paths(use_relative_paths=False):
     output = output.strip()
 
     return tired.parse.iterate_string_multiline(output)
+
+
+def get_git_directory_from_nested_context():
+    """
+    TODO: git rev-parse --show-toplevel
+    """
+    pass
