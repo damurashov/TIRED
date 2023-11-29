@@ -1,7 +1,7 @@
 
 def select(options, title=""):
     if len(options) == 1:
-        return options[0]
+        return 0
 
     import simple_term_menu
 
