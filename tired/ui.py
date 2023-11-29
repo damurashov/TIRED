@@ -1,5 +1,8 @@
 
 def select(options, title=""):
+    if len(options) == 1:
+        return options[0]
+
     import simple_term_menu
 
     return simple_term_menu.TerminalMenu(options, title=title).show()
