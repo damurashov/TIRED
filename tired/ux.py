@@ -15,8 +15,11 @@ class JsonConfigStorage:
     def load(self) -> dict:
         import json
 
-        with open(self._file_path, 'r') as f:
-            return json.load(f)
+        try:
+            with open(self._file_path, 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return dict()
 
     def save(self, config: dict) -> None:
         import json
@@ -31,9 +34,8 @@ class ApplicationConfig:
     """
 
     def __init__(self, application_name: str,
-                config_file_name: str = ".config",
-                storage_type: str = "json",
-                auto_sync_on_destruction: bool = True):
+            config_file_name: str = ".config",
+            storage_type: str = "json"):
         """
         storage_type: what is the carrier type. Available values are: "json"
         application_name: string identifier that is used to distinguish between
@@ -45,21 +47,16 @@ class ApplicationConfig:
         tired.logging.debug(f'Ensuring directory {self._config_directory_path} exists')
         self._config_directory_path.mkdir(parents=True, exist_ok=True)
         self._config_file_path = self._config_directory_path / config_file_name
-        self._auto_sync_on_destruction = auto_sync_on_destruction
 
         # Create, or load config file
 
-        if config_storage_type == "json":
+        if storage_type == "json":
             self._config_storage = JsonConfigStorage(str(self._config_file_path))
             self._config = self._config_storage.load()
         else:
-            raise Exception(f'Unsupported config type "{config_storage_type}"')
+            raise Exception(f'Unsupported config type "{storage_type}"')
 
-    def __del__(self):
-        if self._auto_sync_on_destruction:
-            self.sync()
-
-    def set_field(field_name: str, field_value: object):
+    def set_field(self, field_name: str, field_value: object):
         """
         Updates a (field,value) pair. If it does not exist, it will be created.
         field_name: unique string identifier
@@ -69,7 +66,7 @@ class ApplicationConfig:
         """
         self._config[field_name] = field_value
 
-    def get_field(field_name: str) -> object:
+    def get_field(self, field_name: str) -> object:
         """
         May raise `KeyError`
         """
