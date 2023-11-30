@@ -20,7 +20,8 @@ setup(
     install_requires=[
         "simple_term_menu",
         "datetime",
-        "pyserial"
+        "pyserial",
+        "appdirs",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
