@@ -2,10 +2,27 @@ import pathlib
 import tired.fs
 import tired.logging
 
+
 class JsonConfigStorage:
+    """
+    Stores a dict in a JSON file
+    @pre it is assumed that the dict is a valid JSON object
+    """
 
     def __init__(self, file_path: str):
-        self._
+        self._file_path = file_path
+
+    def load(self) -> dict:
+        import json
+
+        with open(self._file_path, 'r') as f:
+            return json.load(f)
+
+    def save(self, config: dict) -> None:
+        import json
+
+        with open(self._file_path, 'w') as f:
+            json.dump(config, f, indent=4)
 
 
 class ApplicationConfig:
@@ -15,19 +32,32 @@ class ApplicationConfig:
 
     def __init__(self, application_name: str,
                 config_file_name: str = ".config",
-                storage_type: str = "json"):
+                storage_type: str = "json",
+                auto_sync_on_destruction: bool = True):
         """
         storage_type: what is the carrier type. Available values are: "json"
         application_name: string identifier that is used to distinguish between
         various configuration directories
         config_file_name: The name of the config file
         """
-        config_directory_path = pathlib.Path(tired.fs.get_platform_config_directory_path()) / application_name
-        tired.logging.debug(f'Ensuring directory {config_directory_path} exists')
-        config_directory_path.mkdir(parents=True, exist_ok=True)
+        # Initialize paths
+        self._config_directory_path = pathlib.Path(tired.fs.get_platform_config_directory_path()) / application_name
+        tired.logging.debug(f'Ensuring directory {self._config_directory_path} exists')
+        self._config_directory_path.mkdir(parents=True, exist_ok=True)
+        self._config_file_path = self._config_directory_path / config_file_name
+        self._auto_sync_on_destruction = auto_sync_on_destruction
+
+        # Create, or load config file
 
         if config_storage_type == "json":
-            self._config_storage = JsonConfigStorage()
+            self._config_storage = JsonConfigStorage(str(self._config_file_path))
+            self._config = self._config_storage.load()
+        else:
+            raise Exception(f'Unsupported config type "{config_storage_type}"')
+
+    def __del__(self):
+        if self._auto_sync_on_destruction:
+            self.sync()
 
     def set_field(field_name: str, field_value: object):
         """
@@ -35,5 +65,15 @@ class ApplicationConfig:
         field_name: unique string identifier
         field_value is any object that is supported by the backend If
         `field_value` type is not supported by the backend, an exception may be
-        raised
+        raised when attempting to save the new config
         """
+        self._config[field_name] = field_value
+
+    def get_field(field_name: str) -> object:
+        """
+        May raise `KeyError`
+        """
+        return self._config[field_name]
+
+    def sync(self):
+        self._config_storage.save(self._config)
