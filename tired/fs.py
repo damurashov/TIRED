@@ -27,3 +27,8 @@ def get_directory_content_directories(directory: str, exclude_symbolic_links=Fal
                 and not (exclude_symbolic_links and os.path.islink(absolute_path_string)):
             yield item
 
+
+def get_platform_config_directory_path():
+    import appdirs
+
+    return str(appdirs.user_config_dir())
