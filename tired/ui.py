@@ -1,6 +1,6 @@
 
-def select(options, title=""):
-    if len(options) == 1:
+def select(options, title="", optimize_obvious_selection=True):
+    if len(options) == 1 and optimize_obvious_selection:
         return 0
 
     import simple_term_menu
