@@ -1,4 +1,5 @@
 import serial
+import serial.tools
 
 
 class SerialStream:
