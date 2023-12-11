@@ -1,5 +1,4 @@
 import serial
-import serial.tools
 
 
 class SerialStream:
@@ -44,4 +43,10 @@ class SerialStream:
 
 
 def get_all_serial_devices():
-    return serial.tools.list_ports()
+    import serial.tools
+    import serial.tools.list_ports
+    return serial.tools.list_ports.comports()
+
+
+def get_all_serial_device_names():
+    return map(lambda device: device.device, get_all_serial_devices())
