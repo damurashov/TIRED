@@ -48,5 +48,6 @@ def split_string_space(string: str) -> list:
     """
     Splits string by spaces or tabs
     """
-    return list(re.split(r"[\s]+"), string)
+    import re
+    return list(re.split(r"\s+", string))
 
