@@ -43,3 +43,10 @@ def iterate_string_multiline(string: str, min_n_newline_symbols=1):
     if len(chunk) > 0:
         yield(chunk)
 
+
+def split_string_space(string: str) -> list:
+    """
+    Splits string by spaces or tabs
+    """
+    return list(re.split(r"[\s]+"), string)
+
