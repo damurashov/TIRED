@@ -47,7 +47,7 @@ def find(glob_pattern: str, root: str = None, is_recursive: bool = True, is_file
     if root is None:
         root = os.getcwd()
 
-    path = pathlib.path(glob_pattern)
+    path = pathlib.Path(glob_pattern)
 
     if is_recursive:
         iterator = path.rglob(glob_pattern)
@@ -63,7 +63,6 @@ def find_unique(*args, **kwargs):
     """
     Finds exactly one item matching the request, or raises an exception
     """
-    counter = 2
     result = None
     find_iterator = find(*args, **kwargs)
     result = next(find_iterator)
