@@ -1,3 +1,6 @@
+import os
+
+
 def get_directory_content(directory: str):
     """
     Iterate only through directory content
@@ -28,7 +31,7 @@ def get_directory_content_directories(directory: str, exclude_symbolic_links=Fal
             yield item
 
 
-def find(glob_pattern: str, is_recursive: bool = True, is_file: bool = None, is_link: bool = None, is_directory: bool = None):
+def find(glob_pattern: str, root: str = None, is_recursive: bool = True, is_file: bool = None, is_link: bool = None, is_directory: bool = None):
     """
     Finds an item in a directory. Additional constraints (is_recursive,
     is_file, is_link) may be imposed, `None` for "doesn't matter".
@@ -39,6 +42,9 @@ def find(glob_pattern: str, is_recursive: bool = True, is_file: bool = None, is_
         return (is_file and path.is_file() or is_file is None) and \
             (is_directory == path.is_dir() or is_directory is None) and \
             (is_link == path.is_link() or is_link is None)
+
+    if root is None:
+        root = os.getcwd()
 
     path = pathlib.path(glob_pattern)
 
