@@ -1,4 +1,5 @@
 import os
+import pathlib
 
 
 def get_directory_content(directory: str):
