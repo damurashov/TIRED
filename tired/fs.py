@@ -1,5 +1,6 @@
 import os
 import pathlib
+import tired.logging
 
 
 def get_directory_content(directory: str):
@@ -7,7 +8,6 @@ def get_directory_content(directory: str):
     Iterate only through directory content
     """
     import os
-    import pathlib
 
     real_path = pathlib.Path(directory).resolve()
     content = os.listdir(str(real_path))
@@ -20,7 +20,6 @@ def get_directory_content_directories(directory: str, exclude_symbolic_links=Fal
     List-out everything but directories
     """
     import os
-    import pathlib
 
     directory_path_object = pathlib.Path(directory).resolve()
 
@@ -32,7 +31,7 @@ def get_directory_content_directories(directory: str, exclude_symbolic_links=Fal
             yield item
 
 
-def find(glob_pattern: str, root: str = None, is_recursive: bool = True, is_file: bool = None, is_link: bool = None, is_directory: bool = None):
+def find(glob_pattern: str, root: str = None, is_recursive: bool = True, is_file: bool = None, is_symlink: bool = None, is_directory: bool = None):
     """
     Finds an item in a directory. Additional constraints (is_recursive,
     is_file, is_link) may be imposed, `None` for "doesn't matter".
@@ -42,12 +41,12 @@ def find(glob_pattern: str, root: str = None, is_recursive: bool = True, is_file
     def find_filter(path):
         return (is_file and path.is_file() or is_file is None) and \
             (is_directory == path.is_dir() or is_directory is None) and \
-            (is_link == path.is_link() or is_link is None)
+            (is_symlink == path.is_symlink() or is_symlink is None)
 
     if root is None:
         root = os.getcwd()
 
-    path = pathlib.Path(glob_pattern)
+    path = pathlib.Path(root)
 
     if is_recursive:
         iterator = path.rglob(glob_pattern)
@@ -64,15 +63,20 @@ def find_unique(*args, **kwargs):
     Finds exactly one item matching the request, or raises an exception
     """
     result = None
-    find_iterator = find(*args, **kwargs)
-    result = next(find_iterator)
+    result = list(find(*args, **kwargs))
+    tired.logging.debug("result", str(result))
 
-    try:
-        result = next(find_iterator)
-    except StopIteration as e:
-        return result
+    if len(result) == 0:
+        tired.logging.error("Failed to find file")
 
-    raise Exception("The requested pattern does not match to a unique response")
+        raise FileNotFoundError("Failed to find file")
+    elif len(result) > 1:
+        tired.logging.error("More than 1 file matches the query")
+
+        raise FileNotFoundError("More than 1 file matches the query")
+
+
+    return result[0]
 
 
 def get_platform_config_directory_path():
