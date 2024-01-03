@@ -1,4 +1,3 @@
-
 def select(options, title="", optimize_obvious_selection=True):
     if len(options) == 1 and optimize_obvious_selection:
         return 0
@@ -27,3 +26,23 @@ def get_input_using_temporary_file(file_path=".tmp", editor="vim", initial_messa
 
     with open(file_path, 'r') as f:
         return f.read()
+
+
+def select_map(options_dict: dict, title="", optimize_obvious_selection=True):
+    """
+    Offers a user multiple choices, each one is associated w/ a particular
+    value, e.g. callback.
+
+    Returns (key, selection) pair.
+    """
+    options = list(options_dict.keys())
+    selected_option_id = select(list(map(str, options)), title=title, optimize_obvious_selection=optimize_obvious_selection)
+    key = options[selected_option_id]
+
+    return key, options_dict[key]
+
+
+def select_callback(options_cb: dict, title=""):
+    key, callback = select_map(options_cb, title, optimize_obvious_selection=False)
+    callback()
+
