@@ -1,4 +1,4 @@
-import * from tired.ux
+from tired.ux import *
 import os
 import pathlib
 import tired.fs
