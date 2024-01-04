@@ -24,7 +24,7 @@ def try_get_env(variable_name, accepted_values=None, panic_if_missing=False, typ
 
         raise ValueError(message)
 
-    if type_ is not None:
+    if type_ is not None and value is not None:
         try:
             value = type_(value)
         except ValueError as e:
