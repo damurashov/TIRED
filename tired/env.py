@@ -18,7 +18,7 @@ def try_get_env(variable_name, accepted_values=None, panic_if_missing=False):
         tired.logging.error(message)
 
         raise ValueError(message)
-    else if accepted_values is not None and value not in accepted_values:
+    elif accepted_values is not None and value not in accepted_values:
         message = f'Environment variable has value "{value}", but accepted values are: "{accepted_values}"'
         tired.logging.error(message)
 
