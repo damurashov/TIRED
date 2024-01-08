@@ -1,6 +1,8 @@
+import dataclasses
 import tired.command
 import tired.logging
 import tired.parse
+import tired.shlex
 
 
 _LOG_CONTEXT = "tired.command"
@@ -28,6 +30,40 @@ def get_current_commit_hash():
         raise Exception(f"Failed to execute command `{command_string}`, returned {code}")
 
     return output.strip()
+
+
+@dataclasses.dataclass
+class Staged:
+    status: str
+    relative_path: str
+    new_path: str = None  # Only valid in the case of a rename
+
+
+def get_staged_status(use_relative_paths=False):
+    """
+    Iterates through staged files returning the instances of `Staged` class
+    """
+    relative_flag = "--relative" if use_relative_paths else ""
+    command_string = f"git status --short"
+    output, code = tired.command.get_output_with_code(command_string)
+
+    if code != 0:
+        tired.logging.error(_LOG_CONTEXT, f"Failed to execute command `{command_string}`")
+
+        raise Exception(f"Failed to execute command `{command_string}`, returned {code}")
+
+    if "to be committed" not in output:
+        tired.logging.warning(f"Nothing is staged for commit")
+
+    output = filter(lambda s: s[0] in "MARCD", tired.parse.iterate_string_multiline(output))
+
+    for status_line in output:
+        parsed_status = tired.shlex.split(status_line)
+        status = parsed_status[0]
+        path = parsed_status[1]
+        new_path = parsed_status[3] if '->' in parsed_status else None
+
+        yield Staged(status, path, new_path)
 
 
 def get_staged_file_paths(use_relative_paths=False):
