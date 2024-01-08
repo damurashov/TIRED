@@ -35,7 +35,7 @@ def get_current_commit_hash():
 @dataclasses.dataclass
 class Staged:
     status: str
-    relative_path: str
+    path: str
     new_path: str = None  # Only valid in the case of a rename
 
 
