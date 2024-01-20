@@ -83,3 +83,10 @@ def get_platform_config_directory_path():
     import appdirs
 
     return str(appdirs.user_config_dir())
+
+
+def append_or_create(path):
+    try:
+        return open(path, 'a')
+    except FileNotFoundError:
+        return open(path, 'w')
