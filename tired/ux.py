@@ -67,11 +67,11 @@ class ApplicationConfig:
         """
         self._config[field_name] = field_value
 
-    def get_field(self, field_name: str) -> object:
+    def get_field(self, *args, **kwargs) -> object:
         """
         May raise `KeyError`
         """
-        return self._config[field_name]
+        return self._config.get(*args, **kwargs)
 
     def sync(self):
         self._config_storage.save(self._config)
