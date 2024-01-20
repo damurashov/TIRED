@@ -87,7 +87,7 @@ def get_platform_config_directory_path():
 
 def append_or_create(path):
     try:
-        return open(path, 'a')
+        return open(path, 'r+')
     except FileNotFoundError:
         return open(path, 'w')
 
