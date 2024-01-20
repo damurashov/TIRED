@@ -129,8 +129,8 @@ class InnerJoinQuery:
     def generate_sql_select(self):
         return ' '.join(self._generate_sql_select_iter())
 
-    def generate_sql():
-        return self.generate_sql_insert()
+    def generate_sql(self):
+        return ' '.join(self._generate_sql_select_iter())
 
 
 @dataclasses.dataclass
