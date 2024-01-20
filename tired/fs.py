@@ -95,3 +95,5 @@ def append_or_create(path):
 def prepend_or_create(path):
     f = append_or_create(path)
     f.seek(0)
+
+    return f
