@@ -70,6 +70,55 @@ class Table:
         ])
 
 
+@dataclasses.dataclass
+class TableFieldPair:
+    table: object
+    field: object
+
+    def generate_sql_select(self):
+        return f'{self.table.get_name()}.{self.field.get_name()} as {self.table.get_name()}_{self.field.get_name()}'
+
+
+@dataclasses.dataclass
+class InnerJoinQuery:
+    table: object
+
+    def __post_init__(self):
+        self._table_fields = list()
+        self._joined_tables = list()
+
+    def add_field(self, table, field):
+        """
+        Will automatically detect whether the table is different, and will
+        generate appropriate join queries.
+
+        Will not check upon correctness of the join. The `table` MUST be a
+        parent, i.e. must provide a foreign key to the "child" table.
+        """
+        self._table_fields.append(TableFieldPair(table, field))
+
+        if table.get_name() != self.table.get_name():
+            self._joined_tables.append(table)
+
+    def _generate_sql_field_query_iter(self):
+        yield from map(lambda i: i.generate_sql_select(), self._table_fields)
+
+    def _generate_sql_inner_join_iter(self):
+        for table in self._joined_tables:
+            yield f'inner join {table.get_name()} on {table.get_name()}.id = {table.get_name()}.id'
+
+    def _generate_sql_select_iter(self):
+        yield "select"
+        yield ', '.join(self._generate_sql_field_query_iter())
+        yield 'from'
+        yield self.table.get_name()
+        yield from self._generate_sql_inner_join_iter()
+        yield ';'
+
+    def generate_sql_select(self):
+        return ' '.join(self._generate_sql_select_iter())
+
+
 class Db:
     def __init__(self, tables: list):
         self._tables = tables
