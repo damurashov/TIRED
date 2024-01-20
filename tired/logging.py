@@ -15,14 +15,32 @@ LOG_LEVEL_TO_STRING_MAPPING = {
     INFO: "I",
     DEBUG: "D"
 }
+_LEVEL = INFO
 
-def _log_impl(level, *args):
-    context = tired.meta.get_stack_context_string(3)
+def default_printer(level, context, *args):
     message = ' '.join(args)
     output = ' '.join([LOG_LEVEL_TO_STRING_MAPPING[level], _LOG_SECTION_DELIMETER,
         f"{tired.datetime.get_today_time_milliseconds_string()}", f"[{context}]", _LOG_SECTION_DELIMETER, message])
     print(output)
 
+_PRINTER = default_printer
+
+def default_filter(level, context, *args) -> bool:
+    """ Returns True, when printing is allowed """
+    global _LEVEL
+
+    return level <= _LEVEL
+
+_FILTER = default_filter
+
+def _log_impl(level, *args):
+    global _FILTER
+    global _PRINTER
+
+    context = tired.meta.get_stack_context_string(3)
+
+    if _FILTER(level, context, *args):
+        _PRINTER(level, context, *args)
 
 def debug(*args):
     _log_impl(DEBUG, *args)
