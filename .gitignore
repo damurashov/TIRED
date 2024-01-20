@@ -10,3 +10,5 @@ test/test_linsmat_ga_gene_virt.csv
 dist/
 tired.egg-info
 *.swp
+build/
+.eggs
