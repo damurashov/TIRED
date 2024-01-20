@@ -92,8 +92,25 @@ def append_or_create(path):
         return open(path, 'w')
 
 
+class _FilePrependWrapper:
+
+    def __init__(self, instance):
+        self._instance = instance
+        self._content = self._instance.read()
+        self._instance.seek(0)
+
+    def __enter__(self):
+        return self._instance.__enter__()
+
+    def __exit__(self, type_, value, traceback):
+        self.close()
+
+    def close(self):
+        self._instance.write(self._content)
+        self._instance.close()
+
+
 def prepend_or_create(path):
     f = append_or_create(path)
-    f.seek(0)
 
-    return f
+    return _FilePrependWrapper(f)
