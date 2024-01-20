@@ -28,7 +28,7 @@ class IdField:
         return "id"
 
     def generate_sql_create(self):
-        return f'{self.get_name()} integer primary key'
+        return f'{self.get_name()} integer primary key autoincrement'
 
 
 @dataclasses.dataclass
@@ -39,10 +39,10 @@ class ForeignIdField:
         return self.parent_table.get_name() + "_" + "id"
 
     def generate_sql_create(self):
-        return ',\n'.join([
-            f'{self.get_name()} integer not null',
-            f'foreign key ({self.get_name()}) references {self.parent_table.get_name()}(id) on update cascade on delete cascade'
-        ])
+        return f'{self.get_name()} integer not null'
+    #return ',\n'.join([
+            #f'foreign key ({self.get_name()}) references {self.parent_table.get_name()}(id) on update cascade on delete cascade'
+        #])
 
 
 @dataclasses.dataclass
@@ -59,13 +59,21 @@ class Table:
         self._fields = list()
         self._fields.append(IdField())
 
-    def add_field(self, field: InfoField or ForeignIdField):
+    def add_field(self, field):
         self._fields.append(field)
 
+    def _generate_foreign_key_create_iter(self):
+        for field in self._fields:
+            if type(field) is ForeignIdField:
+                yield f'foreign key ({field.get_name()}) references {field.parent_table.get_name()}(id) on update cascade on delete cascade'
+
     def generate_sql_create(self):
+        fields = list(map(lambda i: i.generate_sql_create(), self._fields))
+        foreign_keys = list(self._generate_foreign_key_create_iter())
+
         return '\n'.join([
             f"create table if not exists {self.name} (",
-            ',\n'.join(map(lambda i: i.generate_sql_create(), self._fields)),
+            ',\n'.join([*fields, *foreign_keys]),
             ');',
         ])
 
@@ -82,6 +90,9 @@ class TableFieldPair:
 @dataclasses.dataclass
 class InnerJoinQuery:
     table: object
+    """
+    Child table
+    """
 
     def __post_init__(self):
         self._table_fields = list()
