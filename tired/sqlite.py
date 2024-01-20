@@ -40,9 +40,6 @@ class ForeignIdField:
 
     def generate_sql_create(self):
         return f'{self.get_name()} integer not null'
-    #return ',\n'.join([
-            #f'foreign key ({self.get_name()}) references {self.parent_table.get_name()}(id) on update cascade on delete cascade'
-        #])
 
 
 @dataclasses.dataclass
