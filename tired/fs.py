@@ -105,6 +105,9 @@ class _FilePrependWrapper:
     def __exit__(self, type_, value, traceback):
         self.close()
 
+    def get_content(self):
+        return self._content
+
     def close(self):
         self._instance.write(self._content)
         self._instance.close()
