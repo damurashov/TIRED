@@ -129,15 +129,60 @@ class InnerJoinQuery:
     def generate_sql_select(self):
         return ' '.join(self._generate_sql_select_iter())
 
+    def generate_sql():
+        return self.generate_sql_insert()
+
+
+@dataclasses.dataclass
+class InsertQuery:
+    table: object
+
+    def __post_init__(self):
+        self._field_names = list()
+        self._values = list()
+
+    def add_value(self, field, value):
+        if type(value) is str:
+            value = f'"{value}"'
+        elif type(value) is int:
+            value = str(value)
+
+        self._field_names.append(field.get_name())
+        self._values.append(value)
+
+    def generate_sql_insert(self):
+        columns = ', '.join(self._field_names)
+        values = ', '.join(self._values)
+        return f'insert into {self.table.get_name()} ({columns}) values({values});'
+
+    def generate_sql(self):
+        return self.generate_sql_insert()
+
+
+class GenerateDbQuery:
+    def __init__(self):
+        self._tables = list()
+
+    def add_table(self, table):
+        self._tables.append(table)
+
+    def generate_sql(self):
+        return '\n'.join([
+            'pragma foreign_keys = ON;',
+            *list(map(lambda i: i.generate_sql_create(), self._tables))
+        ])
+
 
 class Db:
-    def __init__(self, tables: list):
+    def __init__(self, tables: list = None):
         self._tables = tables
 
+    def execute(self, query):
+        self._conn.cursor().executescript(query.generate_sql())
+        self._conn.commit()
+
     def connect(self, filename):
-        self.conn = sqlite3.connect(filename)
-        self.conn.cursor().executescript(self.generate_sql_create())
-        self.conn.commit()
+        self._conn = sqlite3.connect(filename)
 
     def generate_sql_create(self):
         return '\n'.join([
