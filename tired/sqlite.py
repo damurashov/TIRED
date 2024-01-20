@@ -88,7 +88,7 @@ class TableFieldPair:
 
 
 @dataclasses.dataclass
-class InnerJoinQuery:
+class InnerJoinSelectQuery:
     table: object
     """
     Child table
