@@ -88,7 +88,7 @@ class TableFieldPair:
 class InnerJoinSelectQuery:
     table: object
     """
-    Child table
+    The table that is being queried
     """
 
     def __post_init__(self):
