@@ -23,7 +23,7 @@ class JsonConfigStorage:
             return dict()
 
     def save(self, config: dict) -> None:
-        tired.logging.info(f'Saving config into "{self._file_path}")
+        tired.logging.info(f'Saving config into "{self._file_path}"')
         import json
 
         with open(self._file_path, 'w') as f:
