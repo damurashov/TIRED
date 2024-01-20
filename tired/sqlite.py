@@ -188,9 +188,3 @@ class Db:
     def connect(self, filename):
         self._conn = sqlite3.connect(filename)
 
-    def generate_sql_create(self):
-        return '\n'.join([
-            'pragma foreign_keys = ON;',
-            *list(map(lambda i: i.generate_sql_create(), self._tables))
-        ])
-
