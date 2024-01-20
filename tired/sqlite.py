@@ -116,7 +116,7 @@ class InnerJoinQuery:
 
     def _generate_sql_inner_join_iter(self):
         for table in self._joined_tables:
-            yield f'inner join {table.get_name()} on {table.get_name()}.id = {table.get_name()}.id'
+            yield f'inner join {table.get_name()} on {self.table.get_name()}.id = {table.get_name()}.id'
 
     def _generate_sql_select_iter(self):
         yield "select"
