@@ -90,3 +90,8 @@ def append_or_create(path):
         return open(path, 'a')
     except FileNotFoundError:
         return open(path, 'w')
+
+
+def prepend_or_create(path):
+    f = append_or_create(path)
+    f.seek(0)
