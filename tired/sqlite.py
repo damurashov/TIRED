@@ -159,14 +159,14 @@ class InsertQuery:
         return self.generate_sql_insert()
 
 
-class GenerateDbQuery:
+class GenerateDbScript:
     def __init__(self):
         self._tables = list()
 
     def add_table(self, table):
         self._tables.append(table)
 
-    def generate_sql(self):
+    def generate_sql_script(self):
         return '\n'.join([
             'pragma foreign_keys = ON;',
             *list(map(lambda i: i.generate_sql_create(), self._tables))
@@ -178,7 +178,14 @@ class Db:
         self._tables = tables
 
     def execute(self, query):
-        self._conn.cursor().executescript(query.generate_sql())
+        cur = self._conn.cursor()
+        cur.execute(query.generate_sql())
+        self._conn.commit()
+
+        return cur.fetchall()
+
+    def execute_script(self, script):
+        self._conn.cursor().executescript(script.generate_sql_script())
         self._conn.commit()
 
     def connect(self, filename):
