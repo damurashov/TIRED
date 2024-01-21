@@ -215,8 +215,8 @@ class GenerateDbScript:
 class Db:
     """
     Opens/creates a database file, and provides an API for executing *Queries*
-    and *Scripts* (the difference is that queries MAY return resulting fields),
-    and CAN contain ONLY one SQL sentence.
+    and *Scripts*. The difference b/w the two is that queries MAY return
+    resulting fields, and CAN contain ONLY one SQL sentence.
     """
     def __init__(self, tables: list = None):
         self._tables = tables
