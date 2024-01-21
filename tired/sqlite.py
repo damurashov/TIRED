@@ -1,5 +1,6 @@
-import sqlite3
 import dataclasses
+import sqlite3
+import tired.logging
 
 
 @dataclasses.dataclass
@@ -232,5 +233,6 @@ class Db:
         self._conn.commit()
 
     def connect(self, filename):
+        tired.logging.info(f'Trying to connect w/ the database "{filename}"')
         self._conn = sqlite3.connect(filename)
 
