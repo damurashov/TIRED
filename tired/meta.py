@@ -52,6 +52,16 @@ def get_stack_context_string(caller_stack_level=1):
     except AttributeError:
         qual_name = caller_frame[0].f_code.co_name  # TODO handle call from class instance (use `self` variable)
 
-    module_name = inspect.getmodule(caller_frame[0]).__name__
+    module_name = inspect.getmodule(caller_frame[0]).__name__ + "."
 
-    return f"{module_name}.{qual_name}"
+    # Try get class name
+    try:
+        class_name = type(caller_frame[0].f_locals["self"]).__name__
+
+        if len(class_name) > 0:
+            class_name += '.'
+    except KeyError as e:
+        class_name = ""
+
+
+    return f"{module_name}{class_name}{qual_name}"
