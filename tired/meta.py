@@ -44,7 +44,6 @@ def get_stack_context_string(caller_stack_level=1):
     Getting function name from that is obvious
 
     """
-    # TODO
     stack = inspect.stack()
     caller_frame = stack[caller_stack_level]
 
