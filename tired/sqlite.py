@@ -4,6 +4,9 @@ import dataclasses
 
 @dataclasses.dataclass
 class InfoField:
+    """
+    Regular field of either `int`, or `text` type
+    """
     name: str
     field_type: object
 
@@ -24,6 +27,10 @@ class InfoField:
 
 
 class IdField:
+    """
+    An autoincremented id field. SHOULD NOT be used directly, as each table has
+    it by default.
+    """
     def get_name(self):
         return "id"
 
@@ -33,6 +40,9 @@ class IdField:
 
 @dataclasses.dataclass
 class ForeignIdField:
+    """
+    Represents a foreign "id" field from some other table.
+    """
     parent_table: object
 
     def get_name(self):
@@ -45,7 +55,8 @@ class ForeignIdField:
 @dataclasses.dataclass
 class Table:
     """
-    Table w/ mandatory ID
+    Representation of a table. By default (and this cannot be changed), each
+    table DOES hold an autoincremented integer "id" field.
     """
     name: str
 
@@ -86,6 +97,16 @@ class TableFieldPair:
 
 @dataclasses.dataclass
 class InnerJoinSelectQuery:
+    """
+    Queries a set of rows from the table in the exact order as they have been
+    added (see "add_field"). If fields from parent tables are queried too, an
+    "inner join" statement WILL BE generated automatically.
+
+    WARNING: As of yet, the implementation DOES NOT check the relation b/w 2
+    tables, so if `self.table` does not pull foreign keys from some parent
+    table, this error WILL NOT be caught, and the behaviour IS undefined.
+    """
+
     table: object
     """
     The table that is being queried
@@ -132,13 +153,27 @@ class InnerJoinSelectQuery:
 
 @dataclasses.dataclass
 class InsertQuery:
+    """
+    Encapsulates an SQL "insert" query.
+    """
+
     table: object
+    """ The table that is being inserted into """
 
     def __post_init__(self):
         self._field_names = list()
         self._values = list()
 
     def add_value(self, field, value):
+        """
+        Adds a (field, value) pair into the query.
+
+        WARNING: please note that if a field does not have a default value, all
+        of its fields MUST BE added in the query.
+
+        WARNING: The "id" field MUST NOT be included.
+        """
+
         if type(value) is str:
             value = f'"{value}"'
         elif type(value) is int:
@@ -157,6 +192,12 @@ class InsertQuery:
 
 
 class GenerateDbScript:
+    """
+    Creates a script for generating a stub for the database. Usually, it is
+    being used at the beginning, after the connection w/ the database is
+    established.
+    """
+
     def __init__(self):
         self._tables = list()
 
@@ -171,6 +212,11 @@ class GenerateDbScript:
 
 
 class Db:
+    """
+    Opens/creates a database file, and provides an API for executing *Queries*
+    and *Scripts* (the difference is that queries MAY return resulting fields),
+    and CAN contain ONLY one SQL sentence.
+    """
     def __init__(self, tables: list = None):
         self._tables = tables
 
