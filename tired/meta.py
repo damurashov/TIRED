@@ -1,4 +1,5 @@
 import inspect
+import pathlib
 
 
 def module_file_as_module_object(module_file):
@@ -52,7 +53,7 @@ def get_stack_context_string(caller_stack_level=1):
     except AttributeError:
         qual_name = caller_frame[0].f_code.co_name  # TODO handle call from class instance (use `self` variable)
 
-    module_name = inspect.getmodule(caller_frame[0]).__name__ + "."
+    module_name = pathlib.Path(caller_frame[1]).resolve().stem + '.'
 
     # Try get class name
     try:
