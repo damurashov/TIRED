@@ -46,3 +46,13 @@ def select_callback(options_cb: dict, title=""):
     key, callback = select_map(options_cb, title, optimize_obvious_selection=False)
     callback()
 
+
+def print_progress(fraction, target=None, round_=1, units="", title=""):
+    """
+    If `target` is None, `current` is used, no percentage
+    """
+    if target is not None and fraction < target:
+        fraction = round(float(fraction / target), round_)
+
+    print(f"\r{title} {fraction}{units}", end='', flush=True)
+
