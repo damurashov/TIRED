@@ -47,12 +47,18 @@ def select_callback(options_cb: dict, title=""):
     callback()
 
 
-def print_progress(fraction, target=None, round_=1, units="", title=""):
+def print_progress(fraction, target=None, round_=1, units='', title="", normalize=True):
     """
-    If `target` is None, `current` is used, no percentage
+    If `target` is None, `current` is used, no percentage.
+    - units = '%' will cause normalizing to 100%
     """
-    if target is not None and fraction < target:
-        fraction = round(float(fraction / target), round_)
+    if normalize and target is not None:
+        fraction = float(fraction / target)
+
+    if units == '%' and target is not None:
+        fraction *= 100.0
+
+    fraction = round(fraction, round_)
 
     print(f"\r{title} {fraction}{units}", end='', flush=True)
 
