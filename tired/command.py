@@ -41,6 +41,8 @@ def get_output_piped_decode(commands, verbose=False, encoding="utf-8"):
     assert code == 0
     out = str(out, encoding=encoding)
 
+    return out
+
 
 def get_output(cmd):
 	tired.logging.debug(_CONTEXT, "Executing command " + '>  `' + cmd + '`')
