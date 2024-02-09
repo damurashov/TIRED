@@ -36,9 +36,10 @@ def get_output_piped(commands, verbose=False):
 	return out, p.returncode
 
 
-def get_output_piped_decode(*args, *kwargs):
-    out, code = get_output_piped(*args, **kwargs)
-    out = str(out[0], encoding='utf-8')
+def get_output_piped_decode(commands, verbose=False, encoding="utf-8"):
+    out, code = get_output_piped(commands, verbose)
+    assert code == 0
+    out = str(out[0], encoding=encoding)
 
 
 def get_output(cmd):
