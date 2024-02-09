@@ -39,7 +39,7 @@ def get_output_piped(commands, verbose=False):
 def get_output_piped_decode(commands, verbose=False, encoding="utf-8"):
     out, code = get_output_piped(commands, verbose)
     assert code == 0
-    out = str(out[0], encoding=encoding)
+    out = str(out, encoding=encoding)
 
 
 def get_output(cmd):
