@@ -62,3 +62,12 @@ def print_progress(fraction, target=None, round_=1, units='', title="", normaliz
 
     print(f"\r{title} {fraction}{units}", end='', flush=True)
 
+
+def print_table_line(content, widths=None):
+    if widths is None:
+        widths = [18 for _ in range(len(content))]
+
+    fmt = ''.join(map(lambda i: f'{{:<{i}}}', widths))
+
+    print(fmt.format(*content))
+
