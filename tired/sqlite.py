@@ -153,6 +153,34 @@ class InnerJoinSelectQuery:
 
 
 @dataclasses.dataclass
+class UpdateQuery:
+    table: object
+
+    def __post_init__(self):
+        self._eq_constraints = list()
+        self._value_mappings = list()
+
+    def add_field_set(self, field, value):
+        self._value_mappings += [(field, value)]
+
+    def add_eq_constraint(self, field, value):
+        self._eq_constraints += [(field, value)]
+
+    def generate_sql(self):
+        out = ' '.join([
+            'UPDATE',
+            self.table.get_name(),
+            'SET',
+            ','.join(map(lambda f, v: f"f='{v}'" for f, v in self._value_mappings)),
+            'WHERE',
+            ' AND '.join(map(lambda f, v: f'f={v}' for f, v in self._eq_constraints)),
+            ';'
+        ])
+
+        return out
+
+
+@dataclasses.dataclass
 class InsertQuery:
     """
     Encapsulates an SQL "insert" query.
@@ -227,6 +255,9 @@ class Db:
         self._conn.commit()
 
         return cur.fetchall()
+
+    def execute_query(self, query):
+        return self.execute(query)
 
     def execute_script(self, script):
         self._conn.cursor().executescript(script.generate_sql_script())
