@@ -64,9 +64,13 @@ class Table:
     def get_name(self):
         return self.name
 
+    def get_id_field(self):
+        return self._id_field
+
     def __post_init__(self):
         self._fields = list()
-        self._fields.append(IdField())
+        self._id_field = IdField()
+        self._fields.append(self._id_field)
 
     def add_field(self, field):
         self._fields.append(field)
@@ -161,19 +165,19 @@ class UpdateQuery:
         self._value_mappings = list()
 
     def add_field(self, field, value):
-        self._value_mappings += [(field, value)]
+        self._value_mappings += [(field.get_name(), value)]
 
     def add_eq_constraint(self, field, value):
-        self._eq_constraints += [(field, value)]
+        self._eq_constraints += [(field.get_name(), value)]
 
     def generate_sql(self):
         out = ' '.join([
             'UPDATE',
             self.table.get_name(),
             'SET',
-            ','.join(map(lambda f, v: f"f='{v}'" for f, v in self._value_mappings)),
+            ','.join([f"f='{v}'" for f, v in self._value_mappings]),
             'WHERE',
-            ' AND '.join(map(lambda f, v: f'f={v}' for f, v in self._eq_constraints)),
+            ' AND '.join([f'f={v}' for f, v in self._eq_constraints]),
             ';'
         ])
 
