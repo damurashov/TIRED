@@ -160,7 +160,7 @@ class UpdateQuery:
         self._eq_constraints = list()
         self._value_mappings = list()
 
-    def add_field_set(self, field, value):
+    def add_field(self, field, value):
         self._value_mappings += [(field, value)]
 
     def add_eq_constraint(self, field, value):
