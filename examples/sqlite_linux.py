@@ -46,3 +46,8 @@ if __name__ == "__main__":
     query.add_field(parent, f2)
     print(query.generate_sql())
     print(db.execute(query))
+
+    query = tired.sqlite.UpdateQuery(parent)
+    query.add_field(f1, "who")
+    query.add_eq_constraint(parent.get_id_field(), 1)
+    print(query.generate_sql())
