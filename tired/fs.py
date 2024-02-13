@@ -58,6 +58,20 @@ def find(glob_pattern: str, root: str = None, is_recursive: bool = True, is_file
     return filtered_iterator
 
 
+def find_up(glob_pattern: str, root: str = None, is_file: bool = None, is_symlink: bool = None, is_directory: bool = None):
+    if root is None:
+        root = pathlib.Path(os.getcwd()).resolve()
+    else:
+        root = pathlib.Path(root).resolve()
+
+    n_steps = len(root.parts)
+
+    while n_steps:
+        yield from find(glob_pattern, root, False, is_file, is_symlink, is_directory)
+        n_steps -= 1
+        root = root.parent
+
+
 def find_unique(*args, **kwargs):
     """
     Finds exactly one item matching the request, or raises an exception
