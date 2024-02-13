@@ -51,7 +51,7 @@ def find(glob_pattern: str, root: str = None, is_recursive: bool = True, is_file
     if is_recursive:
         iterator = path.rglob(glob_pattern)
     else:
-        iterator = path.rlob(glob_pattern)
+        iterator = path.glob(glob_pattern)
 
     filtered_iterator = filter(find_filter, iterator)
 
@@ -66,7 +66,7 @@ def find_up(glob_pattern: str, root: str = None, is_file: bool = None, is_symlin
 
     n_steps = len(root.parts)
 
-    while n_steps:
+    while n_steps > 0:
         yield from find(glob_pattern, root, False, is_file, is_symlink, is_directory)
         n_steps -= 1
         root = root.parent
