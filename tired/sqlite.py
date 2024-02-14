@@ -175,9 +175,9 @@ class UpdateQuery:
             'UPDATE',
             self.table.get_name(),
             'SET',
-            ','.join([f"f='{v}'" for f, v in self._value_mappings]),
+            ','.join([f"{f}='{v}'" for f, v in self._value_mappings]),
             'WHERE',
-            ' AND '.join([f'f={v}' for f, v in self._eq_constraints]),
+            ' AND '.join([f'{f}={v}' for f, v in self._eq_constraints]),
             ';'
         ])
 
