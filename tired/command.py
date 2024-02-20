@@ -38,7 +38,13 @@ def get_output_piped(commands, verbose=False):
 
 def get_output_piped_decode(commands, verbose=False, encoding="utf-8"):
     out, code = get_output_piped(commands, verbose)
-    assert code == 0
+
+    if code != 0:
+        message = f'Return code {code} for "{commands}"'
+        tired.logging.error(message)
+
+        raise Exception(message)
+
     out = str(out, encoding=encoding)
 
     return out
