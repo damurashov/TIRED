@@ -19,7 +19,7 @@ def get_today_time_string():
 
 
 def get_today_date_string_human_readable():
-    return datetime.datetime.now().strftime("%d %B, %Y")
+    return datetime.datetime.now().strftime("%B %d, %Y")
 
 def get_today_time_seconds_string():
     current_date = datetime.datetime.strftime(datetime.datetime.now(), TIME_FORMAT_SECONDS)
