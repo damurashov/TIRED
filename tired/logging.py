@@ -32,8 +32,13 @@ class NetworkLoggingMessage(dict):
             return NetworkLoggingMessage()
 
     @staticmethod
-    def make_response_from_payload(payload):
-        return NetworkLoggingMessage({"msgid": "response", "payload": payload})
+    def make_response_from_payload(payload, timestamp=None):
+        ret = NetworkLoggingMessage({"msgid": "response", "payload": payload})
+
+        if timestamp:
+            ret["counter"] = str(timestamp)
+
+        return ret
 
     @staticmethod
     def make_write_request_from_payload(payload):
@@ -54,12 +59,49 @@ class NetworkLoggingMessage(dict):
     def try_get_payload(self):
         return self.get("payload", None)
 
+    def try_get_timestamp(self):
+        return self.get("timestamp", None)
+
+
+@dataclasses.dataclass
+class _CountedQueueItem:
+    timestamp: object
+    item: object
+
+
+@dataclasses.dataclass
+class _CountedQueue:
+    """ Stores entries decodated w/ either timestamp, or a counter """
+    max_size = 4096
+    _queue = list()
+
+    _counter = 0
+    """ Helps distinguishing obsolete entries during requests """
+
+    def push(self, item, timestamp=None):
+        if timestamp is None:
+            timestamp = self._counter
+
+        self._queue.append(_CountedQueueItem(timestamp, item))
+        self._counter += 1
+        self._curtail()
+
+    def _curtail(self):
+        if len(self._queue) > self.max_size:
+            self._queue = self._queue[-self.max_size - 1:]
+
+    def iter(self, timestamp=None):
+        if timestamp is None:
+            yield from self._queue
+        else:
+            yield from filter(lambda i: i.timestamp > timestamp, self._queue)
+
 
 class NetworkLoggingServer(socketserver.BaseRequestHandler):
     instance = None
     host = None
     port = None
-    _queue = list()
+    _queue = _CountedQueue()
     _lock = threading.Lock()
 
     @staticmethod
@@ -76,29 +118,23 @@ class NetworkLoggingServer(socketserver.BaseRequestHandler):
                 pass
 
     def append_to_queue(self, item: str):
-        self._queue.append(item)
-
-        if len(self._queue) > 4096:  # TODO magic
-            self._queue = self._queue[-self.queue_size_items - 1:]  # XXX
+        self._queue.push(item)
 
     def handle(self):
-        print('got request')
-        # self.rfile is a file-like object created by the handler;
-        # we can now use e.g. readline() instead of raw recv() calls
-        #self.data = self.rfile.readline().strip()
-        #self.data = self.rfile.read().strip()
+        """ https://docs.python.org/3.7/library/socketserver.html#socketserver.StreamRequestHandler """
         self.data = str(self.request.recv(1024).strip(), 'utf-8')
         request = NetworkLoggingMessage.from_str(self.data)
 
         if request.is_read():
+            # Handle read request
             self._lock.acquire()
 
-            for item in self._queue:
+            # Queue items after timestamp (if one is present in the request)
+            for item in self._queue.iter(request.try_get_timestamp()):
                 # pack
-                response = NetworkLoggingMessage.make_response_from_payload(item)
+                response = NetworkLoggingMessage.make_response_from_payload(item.item, item.timestamp)
 
                 # send
-                #self.wfile.write(response.as_str())
                 self.request.sendall(response.as_bytes())
 
             self._lock.release()
@@ -111,13 +147,13 @@ class NetworkLoggingServer(socketserver.BaseRequestHandler):
 
             self._lock.release()
         else:
+            # Handle raw read request (just dump the items)
             print('got read (raw)')
             self._lock.acquire()
 
-            for item in self._queue:
+            for item in self._queue.iter():
                 # send raw
-                #self.wfile.write(item)
-                self.request.sendall(bytes(item, 'utf-8'))
+                self.request.sendall(bytes(item.item, 'utf-8'))
 
             self._lock.release()
 
@@ -148,7 +184,7 @@ def default_printer(level, context, *args):
 _PRINTER = default_printer
 
 
-def set_printer_network(host="localhost", port=8080):
+def set_printer_network(host="localhost", port=8010):
 
     if NetworkLoggingServer.instance is not None:
         return
