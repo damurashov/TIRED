@@ -4,7 +4,7 @@ import sys
 
 
 if __name__ == "__main__":
-    server = tired.logging.set_printer_network(port=int(sys.argv[1]))
+    tired.logging.set_printer_network(port=int(sys.argv[1]))
 
     while True:
         tired.logging.info("Tick")
