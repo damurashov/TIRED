@@ -1,11 +1,12 @@
 import dataclasses
-import socket
 import json
+import socket
 import socketserver
 import threading
 import tired
 import tired.datetime
 import tired.meta
+import tired.parse
 
 
 _LOG_SECTION_DELIMETER = "-"
@@ -32,17 +33,35 @@ class NetworkLoggingMessage(dict):
             return NetworkLoggingMessage()
 
     @staticmethod
+    def from_bytes(json_bytes, encoding='utf-8'):
+        try:
+            ret = str(json_bytes, encoding).strip()
+
+            return ret
+        except Exception as e:
+            return NetworkLoggingMessage()
+
+    @staticmethod
     def make_response_from_payload(payload, timestamp=None):
         ret = NetworkLoggingMessage({"msgid": "response", "payload": payload})
 
         if timestamp:
-            ret["counter"] = str(timestamp)
+            ret["counter"] = timestamp
 
         return ret
 
     @staticmethod
     def make_write_request_from_payload(payload):
         return NetworkLoggingMessage({"msgid": "write", "payload": payload})
+
+    @staticmethod
+    def make_read_request(timestamp=None):
+        request = NetworkLoggingMessage({"msgid": "read"})
+
+        if timestamp is not None:
+            request["timestamp"] = timestamp
+
+        return request
 
     def as_str(self):
         return json.dumps(self) + '\n'
@@ -55,6 +74,9 @@ class NetworkLoggingMessage(dict):
 
     def is_write(self):
         return self.get("msgid", None) == "write"
+
+    def is_response(self):
+        return self.get("msgid", None) == "response"
 
     def try_get_payload(self):
         return self.get("payload", None)
@@ -94,7 +116,7 @@ class _CountedQueue:
         if timestamp is None:
             yield from self._queue
         else:
-            yield from filter(lambda i: i.timestamp > timestamp, self._queue)
+            yield from filter(lambda i: i.timestamp == timestamp, self._queue)
 
 
 class NetworkLoggingServer(socketserver.BaseRequestHandler):
@@ -116,6 +138,8 @@ class NetworkLoggingServer(socketserver.BaseRequestHandler):
                 sock.sendall(bytes(data + "\n", "utf-8"))
             except ConnectionRefusedError as e:
                 pass
+            except BrokenPipeError as e:
+                pass
 
     def append_to_queue(self, item: str):
         self._queue.push(item)
@@ -135,7 +159,12 @@ class NetworkLoggingServer(socketserver.BaseRequestHandler):
                 response = NetworkLoggingMessage.make_response_from_payload(item.item, item.timestamp)
 
                 # send
-                self.request.sendall(response.as_bytes())
+                try:
+                    self.request.sendall(response.as_bytes())
+                except ConnectionResetError as e:
+                    pass
+                except BrokenPipeError as e:
+                    pass
 
             self._lock.release()
         elif request.is_write():
@@ -153,7 +182,10 @@ class NetworkLoggingServer(socketserver.BaseRequestHandler):
 
             for item in self._queue.iter():
                 # send raw
-                self.request.sendall(bytes(item.item, 'utf-8'))
+                try:
+                    self.request.sendall(bytes(item.item, 'utf-8'))
+                except Exception as e:
+                    pass
 
             self._lock.release()
 
@@ -200,8 +232,32 @@ def set_printer_network(host="localhost", port=8010):
     _PRINTER = server.send_message
 
 
-def connect_printer_network(host="localhost", port=8080):
-    pass
+def iter_connect_read_printer_network(counter, host="localhost", port=8080, read_counter=4096):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        try:
+            # Connect to server and send data
+            sock.connect((host, port))
+
+            request = NetworkLoggingMessage.make_read_request(timestamp=counter)
+            sock.send(request.as_bytes())
+
+            while True:
+                read = str(sock.recv(read_counter), 'utf-8')
+
+                if len(read) == 0:
+                    return None
+                else:
+                    for line in tired.parse.iterate_string_multiline(read):
+                        result = NetworkLoggingMessage.from_str(line)
+
+                        if result.is_response:
+                            yield result
+
+                            return
+
+                    return None
+        except ConnectionRefusedError as e:
+            pass
 
 
 def default_filter(level, context, *args) -> bool:
