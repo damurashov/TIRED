@@ -39,6 +39,31 @@ class Staged:
     new_path: str = None  # Only valid in the case of a rename
 
 
+Status = Staged
+
+
+def get_status(use_relative_paths=False):
+    """
+    Iterates through staged files returning the instances of `Staged` class
+    """
+    relative_flag = "--relative" if use_relative_paths else ""
+    command_string = f"git status --short"
+    output, code = tired.command.get_output_with_code(command_string)
+
+    if code != 0:
+        tired.logging.error(_LOG_CONTEXT, f"Failed to execute command `{command_string}`")
+
+        raise Exception(f"Failed to execute command `{command_string}`, returned {code}")
+
+    for status_line in output:
+        parsed_status = tired.shlex.split(status_line)
+        status = parsed_status[0]
+        path = parsed_status[1]
+        new_path = parsed_status[3] if '->' in parsed_status else None
+
+        yield Status(status, path, new_path)
+
+
 def get_staged_status(use_relative_paths=False):
     """
     Iterates through staged files returning the instances of `Staged` class
