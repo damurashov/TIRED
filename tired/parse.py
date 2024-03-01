@@ -1,3 +1,6 @@
+import re
+
+
 def _get_multiline_format(string):
     """
     Returns either `\r\n`, `\r`, `\n`, or None, if unable to detect
@@ -13,9 +16,33 @@ def _get_multiline_format(string):
         return None
 
 
-def iterate_string_multiline(string: str, min_n_newline_symbols=1):
-    import re
+@dataclasses.dataclass
+class TokenizationResult:
+    start_position: int
+    end_position: int
 
+
+class GenericRegexTokenizer:
+    def __init__(self, expression, re_flags=re.MULTILINE):
+        self._expression = expression
+        self._flags = flags
+
+    def try_tokenize(self, string):
+        regex = re.compile(self._expression)
+        it = iter(regex.finditer(self._expression, self._flags))
+
+        try:
+            result = next(it)
+        except StopIteration as e:
+            return None
+
+        return TokenizationResult(
+            start_position=result.start,
+            end_position=result.end
+        )
+
+
+def iterate_string_multiline(string: str, min_n_newline_symbols=1):
     multiline_format = _get_multiline_format(string)
 
     if multiline_format is None:
@@ -48,6 +75,5 @@ def split_string_space(string: str) -> list:
     """
     Splits string by spaces or tabs
     """
-    import re
     return list(re.split(r"\s+", string))
 
