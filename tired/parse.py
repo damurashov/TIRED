@@ -1,4 +1,5 @@
 import re
+import dataclasses
 
 
 def _get_multiline_format(string):
@@ -17,29 +18,122 @@ def _get_multiline_format(string):
 
 
 @dataclasses.dataclass
-class TokenizationResult:
+class LexingResult:
     start_position: int
     end_position: int
+    chunk: str
+    lexer_identifier: object
+
+    def get_string_remainder(self, string):
+        """
+        It is assumed no other tokens are present within the string
+        """
+        return string[self.end_position:]
 
 
-class GenericRegexTokenizer:
-    def __init__(self, expression, re_flags=re.MULTILINE):
+class GenericRegexLexer:
+    def __init__(self, identifier, expression, re_flags=re.MULTILINE):
         self._expression = expression
-        self._flags = flags
+        self._flags = re_flags
+        self._identifier = identifier
 
-    def try_tokenize(self, string):
+    def try_get_closest_lex(self, string):
+        """ lexer_identifier: hashable """
         regex = re.compile(self._expression)
-        it = iter(regex.finditer(self._expression, self._flags))
+        it = iter(regex.finditer(string, self._flags))
 
         try:
             result = next(it)
         except StopIteration as e:
             return None
 
-        return TokenizationResult(
-            start_position=result.start,
-            end_position=result.end
+        #print(result, regex)
+
+        return LexingResult(
+            start_position=result.start(),
+            end_position=result.end(),
+            chunk=string[result.start():result.end()],
+            lexer_identifier=self._identifier,
         )
+
+
+@dataclasses.dataclass
+class AmbiguityResolutionFailure(Exception):
+    message: str
+    lexing_results: list
+    candidates: list
+
+    def __post_init__(self):
+        Exception.__init__(self, self.message, "lexing results:", self.lexing_results, "candidates:", self.candidates)
+
+
+class ClosestLongestWinsResolutionStrategy:
+    """
+    Amont multiple lex results, it picks the one that is the closest and
+    longest. Returns a single LexingResult, or throws and exception.
+    """
+    def resolve(self, results) -> LexingResult:
+        """
+        results: accumulated results from all lexers. Must be of len > 1
+        """
+        # Get the one that is closest
+        closest = min(results, key=lambda i: i.start_position)
+        candidates = filter(lambda i: i.start_position == closest.start_position, results)
+        candidates = list(candidates)
+
+        # Pick the longest one
+        longest = max(candidates, key=lambda i: i.end_position - i.start_position)
+        candidates = filter(lambda i: i.end_position == longest.end_position, candidates)
+        candidates = list(candidates)
+
+        if len(candidates) != 1:
+            raise AmbiguityResolutionFailure(message=type(self).__name__ + ' got more than 1 candidate', lexing_results=results, candidates=candidates)
+
+        return candidates[0]
+
+
+class Tokenizer:
+    """
+    Runs multiple lexers on a string, returns the lexer result that is closest
+    to the beginning of the string (by default). There might be ambiguities
+    (such as bound-aligned overlaps) that are handled by a
+    `AmbiguityResolution` strategy.
+    """
+
+    def __init__(self, resolution_strategy=ClosestLongestWinsResolutionStrategy()):
+        self._lexers = list()
+        self._resolution_strategy = resolution_strategy
+
+    def add_lexer(self, lexer):
+        self._lexers.append(lexer)
+
+    def tokenize(self, string, resolution_strategy=None):
+        """
+        Runs all lexers on an input, returns lexer which got the
+        sequence closer to the start.
+        - If 2 or more returned a token, `Lexer.CommonAmbiguity` exception
+          is raised.
+        - When none of the lexers were able to tokenize, `StopIteration` is
+          raised.
+        - When tokens overlap, `Lexer.OverlapAmbiguity` exception is raised.,
+
+        If `resolution_strategy` is None, the default is used
+        """
+
+        if resolution_strategy is None:
+            resolution_strategy = self._resolution_strategy
+
+        # Merge results from all lexers
+        results = map(lambda instance: instance.try_get_closest_lex(string), self._lexers)
+        results = filter(lambda i: i is not None, results)
+
+        results = list(results)
+
+        if len(results) < 1:
+            raise StopIteration
+
+        return resolution_strategy.resolve(results)
+
 
 
 def iterate_string_multiline(string: str, min_n_newline_symbols=1):
