@@ -34,7 +34,9 @@ class LexingResult:
 @dataclasses.dataclass
 class SingleBraceBalanceLexer:
     """
-    Implements a "push-pop" parser that starts on the first encounter of `lbrace`, and stops, when the stack is empty
+    Parses brace-enclosed chunks.
+    Implements a "push-pop" parser that starts on the first encounter of
+    `lbrace`, and stops, when the stack is empty.
     """
     identifier: object
     lbrace: str
@@ -72,6 +74,8 @@ class SingleBraceBalanceLexer:
 
                 if self._balance == 0:
                     self._on_end(string, pos)
+
+                    # Prepare for further chunks
                     self._reset()
 
                     return self._lexing_result
