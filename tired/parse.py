@@ -31,6 +31,19 @@ class LexingResult:
         return string[self.end_position:]
 
 
+@dataclasses.dataclass
+class SingleBraceBalanceLexer:
+    """
+    Implements a "push-pop" parser that starts on the first encounter of `lbrace`, and stops, when the stack is empty
+    """
+    identifier: object
+    lbrace: str
+    rbrace: str
+
+    def try_get_closest_lex(self, string):
+        return None
+
+
 class GenericRegexLexer:
     def __init__(self, identifier, expression, re_flags=re.MULTILINE):
         self._expression = expression
