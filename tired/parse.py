@@ -72,6 +72,7 @@ class SingleBraceBalanceLexer:
 
                 if self._balance == 0:
                     self._on_end(string, pos)
+                    self._reset()
 
                     return self._lexing_result
 
