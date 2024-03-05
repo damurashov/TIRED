@@ -40,7 +40,41 @@ class SingleBraceBalanceLexer:
     lbrace: str
     rbrace: str
 
+    def __post_init__(self):
+        self.reset()
+
+    def _reset(self):
+        self._lexing_result = LexingResult(start_position=0, end_position=0,
+            chunk='', lexer_identifier=self.identifier)
+        self._balance = -1
+
+    def _on_start(self, string, pos):
+        self._lexing_result.start_position = pos
+
+    def _on_end(self, string, pos):
+        self._lexing_result.end_position = pos
+        self._lexing_result.chunk = string[self._lexing_result.start_position:self._lexing_result.end_position]
+
     def try_get_closest_lex(self, string):
+        for pos in range(len(string)):
+            ch = string[pos]
+
+            if ch == self.lbrace:
+                # push
+                if self._balance == -1:
+                    self._on_start(string, pos)
+                    self._balance = 0
+
+                self._balance += 1
+            elif ch == self.rbrace and self._balance > 0:
+                # pop
+                self._balance -= 1
+
+                if self._balance == 0:
+                    self._on_end(string, pos)
+
+                    return self._lexing_result
+
         return None
 
 
