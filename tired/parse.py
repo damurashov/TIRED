@@ -32,7 +32,7 @@ class LexingResult:
 
 
 @dataclasses.dataclass
-class SingleBraceBalanceLexer:
+class SingleBracePairBalanceLexer:
     """
     Parses brace-enclosed chunks.
     Implements a "push-pop" parser that starts on the first encounter of
