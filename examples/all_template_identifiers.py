@@ -9,20 +9,25 @@ def main():
     with open(path, 'r') as f:
         content = f.read()
 
-    tokenizer = tired.parse.Tokenizer()
-    tokenizer.add_lexer(tired.parse.GenericRegexLexer("template", 'template', ))
-    tokenizer.add_lexer(tired.parse.GenericRegexLexer("entity", 'struct', ))
-    tokenizer.add_lexer(tired.parse.GenericRegexLexer("langle", r'<', ))
-    tokenizer.add_lexer(tired.parse.GenericRegexLexer("rangle", r'>', ))
-    tokenizer.add_lexer(tired.parse.GenericRegexLexer("identifier", r'[a-zA-Z0-9]+', ))
+    # Tokens are sort-of "OR"ed, so they have to be mutually exclusive
+    preamble_tokenizer = tired.parse.Tokenizer()
+    preamble_tokenizer.add_lexer(tired.parse.GenericRegexLexer("template", 'template',))
+    preamble_tokenizer.add_lexer(tired.parse.GenericRegexLexer("entity", 'struct', ))
+    preamble_tokenizer.add_lexer(tired.parse.SingleBracePairBalanceLexer("angle", '<', '>'))
+
+    identifier_tokenizer = tired.parse.Tokenizer()
+    # "identifier" conflicts w/ both "struct" and "entity", so it is excracted into separate tokenizer
+    identifier_tokenizer.add_lexer(tired.parse.GenericRegexLexer("identifier", r'[a-zA-Z0-9]+', ))
     state = 0
 
     while len(content):
         try:
             # Get token
             #print("CONTEXT", content[:100])
-            token = tokenizer.tokenize(content)
-            print("GOT TOKEN", token)
+            if state == 4:
+                token = identifier_tokenizer.tokenize(content)
+            else:
+                token = preamble_tokenizer.tokenize(content)
 
             if token.lexer_identifier == 'template' and state == 0:
                 state = 1
@@ -35,6 +40,8 @@ def main():
             elif token.lexer_identifier == "identifier" and state == 4:
                 state = 0
                 print("GOT IDENTIFIER", token)
+            else:
+                state = 0
 
             # Cut the content
             content = token.get_string_remainder(content)
