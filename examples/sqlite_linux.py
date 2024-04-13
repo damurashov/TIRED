@@ -58,3 +58,13 @@ if __name__ == "__main__":
     query.add_field(parent, f2)
     print(query.generate_sql())
     print(db.execute(query))
+
+    delete_query = tired.sqlite.DeleteQuery(parent, 1)
+    print(delete_query.generate_sql())
+    db.execute(delete_query)
+
+    query = tired.sqlite.InnerJoinSelectQuery(parent)
+    query.add_field(parent, f1)
+    query.add_field(parent, f2)
+    print(query.generate_sql())
+    print(db.execute(query))

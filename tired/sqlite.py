@@ -185,6 +185,17 @@ class UpdateQuery:
 
 
 @dataclasses.dataclass
+class DeleteQuery:
+    table: object
+    identifier: int
+
+    def generate_sql(self):
+        out = f'DELETE FROM {self.table.get_name()} where {self.table.get_name()}.id = {self.identifier}'
+
+        return out
+
+
+@dataclasses.dataclass
 class InsertQuery:
     """
     Encapsulates an SQL "insert" query.
