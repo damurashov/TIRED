@@ -3,7 +3,7 @@ def select(options, title="", optimize_obvious_selection=True, option_shortcuts=
     Shortcuts are one-letter hotkeys
     """
     if option_shortcuts is not None and len(option_shortcuts) == len(options):
-        options = map(lambda i: f'[{i[0]}] {i[1]}', zip(options, option_shortcuts))
+        options = list(map(lambda i: f'[{i[0]}] {i[1]}', zip(options, option_shortcuts)))
 
     if len(options) == 1 and optimize_obvious_selection:
         return 0
