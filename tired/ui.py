@@ -1,4 +1,10 @@
-def select(options, title="", optimize_obvious_selection=True):
+def select(options, title="", optimize_obvious_selection=True, option_shortcuts=None):
+    """
+    Shortcuts are one-letter hotkeys
+    """
+    if option_shortcuts is not None and len(option_shortcuts) == len(options):
+        options = map(lambda i: f'[{i[0]}] {i[1]}', zip(options, option_shortcuts))
+
     if len(options) == 1 and optimize_obvious_selection:
         return 0
 
@@ -28,7 +34,7 @@ def get_input_using_temporary_file(file_path=".tmp", editor="vim", initial_messa
         return f.read()
 
 
-def select_map(options_dict: dict, title="", optimize_obvious_selection=True):
+def select_map(options_dict: dict, title="", optimize_obvious_selection=True, option_shortcuts=None):
     """
     Offers a user multiple choices, each one is associated w/ a particular
     value, e.g. callback.
@@ -36,7 +42,8 @@ def select_map(options_dict: dict, title="", optimize_obvious_selection=True):
     Returns (key, selection) pair.
     """
     options = list(options_dict.keys())
-    selected_option_id = select(list(map(str, options)), title=title, optimize_obvious_selection=optimize_obvious_selection)
+    selected_option_id = select(list(map(str, options)), title=title,
+        optimize_obvious_selection=optimize_obvious_selection, option_shortcuts=option_shortcuts)
     key = options[selected_option_id]
 
     return key, options_dict[key]
