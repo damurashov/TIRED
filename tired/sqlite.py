@@ -135,8 +135,8 @@ class InnerJoinSelectQuery:
         if table.get_name() != self.table.get_name():
             self._joined_tables.append(table)
 
-    def add_eq_constraint(self, table1, field1, table2, field2):
-        self._eq_constraints.append((table1, field1, table2, field2,))
+    def add_eq_constraint(self, table1, field1, value):
+        self._eq_constraints.append((table1, field1, value))
 
     def _generate_sql_field_query_iter(self):
         yield from map(lambda i: i.generate_sql_select(), self._table_fields)
@@ -146,8 +146,8 @@ class InnerJoinSelectQuery:
             yield f'inner join {table.get_name()} on {self.table.get_name()}.id = {table.get_name()}.id'
 
     def _generate_sql_eq_constraints(self):
-            for t1, f1, t2, f2 in self._eq_constraints:
-                yield f'{t1.get_name()}.{f1.get_name()} = {t2.get_name()}.{f2.get_name()}'
+            for t1, f1, v in self._eq_constraints:
+                yield f'{t1.get_name()}.{f1.get_name()} = "v"'
 
     def _generate_sql_select_iter(self):
         yield "select"
