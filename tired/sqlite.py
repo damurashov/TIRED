@@ -2,6 +2,9 @@ import dataclasses
 import sqlite3
 import tired.logging
 
+######################################################################
+#           First order entities
+######################################################################
 
 @dataclasses.dataclass
 class InfoField:
@@ -119,10 +122,27 @@ class InnerJoinSelectQuery:
 
     def __post_init__(self):
         self._table_fields = list()
-        self._joined_tables = list()
         self._eq_constraints = list()
+        self._inner_joins = list()
 
-    def add_field(self, table, field):
+    def add_parent_table_field(self, parent_table, parent_table_field, child_table):
+        """
+        The parent table might be a few tables away from the table the query
+        is made for
+        """
+        # Make inner join query
+        child_id_field_name = ForeignIdField(parent_table).get_name()
+        child_table_name = child_table.get_name()
+        parent_table_name = parent_table.get_name()
+        join_query = f'inner join {parent_table.get_name()} on {parent_table_name}.id = {child_table_name}.{child_id_field_name}'
+
+        if join_query not in self._inner_joins:
+            self._inner_joins += [join_query]
+
+        # Add field
+        self._table_fields.append(TableFieldPair(parent_table, parent_table_field))
+
+    def add_field(self, field):
         """
         Will automatically detect whether the table is different, and will
         generate appropriate join queries.
@@ -130,10 +150,72 @@ class InnerJoinSelectQuery:
         Will not check upon correctness of the join. The `table` MUST be a
         parent, i.e. must provide a foreign key to the "child" table.
         """
-        self._table_fields.append(TableFieldPair(table, field))
+        self._table_fields.append(TableFieldPair(self.table, field))
 
-        if table.get_name() != self.table.get_name():
-            self._joined_tables.append(table)
+    def add_eq_constraint(self, table1, field1, value):
+        self._eq_constraints.append((table1, field1, value))
+
+    def _generate_sql_field_query_iter(self):
+        yield from map(lambda i: i.generate_sql_select(), self._table_fields)
+
+    def _generate_sql_inner_join_iter(self):
+        for join in self._inner_joins:
+            yield join
+
+    def _generate_sql_eq_constraints(self):
+            for t1, f1, v in self._eq_constraints:
+                yield f'{t1.get_name()}.{f1.get_name()} = "v"'
+
+    def _generate_sql_select_iter(self):
+        yield "select"
+        yield ', '.join(self._generate_sql_field_query_iter())
+        yield 'from'
+        yield self.table.get_name()
+        yield from self._generate_sql_inner_join_iter()
+        if len(self._eq_constraints):
+            yield 'where'
+            yield ' AND '.join(self._generate_sql_eq_constraints())
+        yield ';'
+
+    def generate_sql_select(self):
+        return ' '.join(self._generate_sql_select_iter())
+
+    def generate_sql(self):
+        return ' '.join(self._generate_sql_select_iter())
+
+
+@dataclasses.dataclass
+class HierarchicalSelect:
+    """
+    Queries a set of rows from the table in the exact order as they have been
+    added (see "add_field"). If fields from parent tables are queried too, an
+    "inner join" statement WILL BE generated automatically.
+
+    WARNING: As of yet, the implementation DOES NOT check the relation b/w 2
+    tables, so if `self.table` does not pull foreign keys from some parent
+    table, this error WILL NOT be caught, and the behaviour IS undefined.
+    """
+
+    table: object
+    """
+    The table that is being queried
+    """
+
+    def __post_init__(self):
+        self._table_fields = list()
+        self._joined_tables = list()
+        self._eq_constraints = list()
+        self._inner_joins = map()
+
+    def add_field(self, field):
+        """
+        Will automatically detect whether the table is different, and will
+        generate appropriate join queries.
+
+        Will not check upon correctness of the join. The `table` MUST be a
+        parent, i.e. must provide a foreign key to the "child" table.
+        """
+        self._table_fields.append(TableFieldPair(self.table, field))
 
     def add_eq_constraint(self, table1, field1, value):
         self._eq_constraints.append((table1, field1, value))
@@ -292,4 +374,3 @@ class Db:
     def connect(self, filename):
         tired.logging.info(f'Trying to connect w/ the database "{filename}"')
         self._conn = sqlite3.connect(filename)
-

@@ -29,21 +29,40 @@ if __name__ == "__main__":
     print(insert.generate_sql())
     print(db.execute(insert))
 
+    insert = tired.sqlite.InsertQuery(parent)
+    insert.add_value(f1, "12")
+    insert.add_value(f2, "some string")
+    print(insert.generate_sql())
+    print(db.execute(insert))
+
+    insert = tired.sqlite.InsertQuery(parent)
+    insert.add_value(f1, "12")
+    insert.add_value(f2, "some string")
+    print(insert.generate_sql())
+    print(db.execute(insert))
+
     insert = tired.sqlite.InsertQuery(child)
     insert.add_value(f1, "someone")
     insert.add_value(child_parent_field, 1)
     print(insert.generate_sql())
     print(db.execute(insert))
 
+    insert = tired.sqlite.InsertQuery(child)
+    insert.add_value(f1, "someone else")
+    insert.add_value(child_parent_field, 1)
+    print(insert.generate_sql())
+    print(db.execute(insert))
+
     query = tired.sqlite.InnerJoinSelectQuery(child)
-    query.add_field(parent, f1)
-    query.add_field(child, f1)
+    query.add_parent_table_field(parent, tired.sqlite.IdField(), child)
+    query.add_parent_table_field(parent, f1, child)
+    query.add_field(f1)
     print(query.generate_sql())
     print(db.execute(query))
 
     query = tired.sqlite.InnerJoinSelectQuery(parent)
-    query.add_field(parent, f1)
-    query.add_field(parent, f2)
+    query.add_field(f1)
+    query.add_field(f2)
     print(query.generate_sql())
     print(db.execute(query))
 
@@ -54,8 +73,8 @@ if __name__ == "__main__":
     print(db.execute(query))
 
     query = tired.sqlite.InnerJoinSelectQuery(parent)
-    query.add_field(parent, f1)
-    query.add_field(parent, f2)
+    query.add_field(f1)
+    query.add_field(f2)
     print(query.generate_sql())
     print(db.execute(query))
 
@@ -64,7 +83,7 @@ if __name__ == "__main__":
     db.execute(delete_query)
 
     query = tired.sqlite.InnerJoinSelectQuery(parent)
-    query.add_field(parent, f1)
-    query.add_field(parent, f2)
+    query.add_field(f1)
+    query.add_field(f2)
     print(query.generate_sql())
     print(db.execute(query))
