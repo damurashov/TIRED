@@ -164,72 +164,7 @@ class InnerJoinSelectQuery:
 
     def _generate_sql_eq_constraints(self):
             for t1, f1, v in self._eq_constraints:
-                yield f'{t1.get_name()}.{f1.get_name()} = "v"'
-
-    def _generate_sql_select_iter(self):
-        yield "select"
-        yield ', '.join(self._generate_sql_field_query_iter())
-        yield 'from'
-        yield self.table.get_name()
-        yield from self._generate_sql_inner_join_iter()
-        if len(self._eq_constraints):
-            yield 'where'
-            yield ' AND '.join(self._generate_sql_eq_constraints())
-        yield ';'
-
-    def generate_sql_select(self):
-        return ' '.join(self._generate_sql_select_iter())
-
-    def generate_sql(self):
-        return ' '.join(self._generate_sql_select_iter())
-
-
-@dataclasses.dataclass
-class HierarchicalSelect:
-    """
-    Queries a set of rows from the table in the exact order as they have been
-    added (see "add_field"). If fields from parent tables are queried too, an
-    "inner join" statement WILL BE generated automatically.
-
-    WARNING: As of yet, the implementation DOES NOT check the relation b/w 2
-    tables, so if `self.table` does not pull foreign keys from some parent
-    table, this error WILL NOT be caught, and the behaviour IS undefined.
-    """
-
-    table: object
-    """
-    The table that is being queried
-    """
-
-    def __post_init__(self):
-        self._table_fields = list()
-        self._joined_tables = list()
-        self._eq_constraints = list()
-        self._inner_joins = map()
-
-    def add_field(self, field):
-        """
-        Will automatically detect whether the table is different, and will
-        generate appropriate join queries.
-
-        Will not check upon correctness of the join. The `table` MUST be a
-        parent, i.e. must provide a foreign key to the "child" table.
-        """
-        self._table_fields.append(TableFieldPair(self.table, field))
-
-    def add_eq_constraint(self, table1, field1, value):
-        self._eq_constraints.append((table1, field1, value))
-
-    def _generate_sql_field_query_iter(self):
-        yield from map(lambda i: i.generate_sql_select(), self._table_fields)
-
-    def _generate_sql_inner_join_iter(self):
-        for table in self._joined_tables:
-            yield f'inner join {table.get_name()} on {self.table.get_name()}.id = {table.get_name()}.id'
-
-    def _generate_sql_eq_constraints(self):
-            for t1, f1, v in self._eq_constraints:
-                yield f'{t1.get_name()}.{f1.get_name()} = "v"'
+                yield f'{t1.get_name()}.{f1.get_name()} = "{v}"'
 
     def _generate_sql_select_iter(self):
         yield "select"
