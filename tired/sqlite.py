@@ -299,7 +299,8 @@ class Db:
             cur.execute(query.generate_sql())
             self._conn.commit()
         except sqlite3.OperationalError as e:
-            tired.logging.error(f"Failed to execute query: {sql}")
+            tired.logging.error(f"Failed to execute query: {sql}: {e}")
+            raise e
 
         return cur.fetchall()
 
