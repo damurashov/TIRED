@@ -294,8 +294,12 @@ class Db:
 
     def execute(self, query):
         cur = self._conn.cursor()
-        cur.execute(query.generate_sql())
-        self._conn.commit()
+        sql = query.generate_sql()
+        try:
+            cur.execute(query.generate_sql())
+            self._conn.commit()
+        except sqlite3.OperationalError as e:
+            tired.logging.error("Failed to execute query: {sql}")
 
         return cur.fetchall()
 
