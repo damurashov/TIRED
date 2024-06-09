@@ -247,7 +247,7 @@ class InsertQuery:
         """
 
         if type(value) is str:
-            value = f'"{value}"'
+            value = f"'{value}'"
         elif type(value) is int:
             value = str(value)
 
