@@ -283,6 +283,21 @@ class GenerateDbScript:
         ])
 
 
+class Transaction:
+    def __init__(self):
+        self._queries = list()
+
+    def add_query(self, query):
+        self._queries.append(query)
+
+    def generate_sql_script(self):
+        result = list()
+        result.append("BEGIN TRANSACTION;")
+        result.append('\n'.join(map(lambda i: i.generate_sql(), self._queries)))
+        result.append("COMMIT;")
+        return '\n'.join(result)
+
+
 class Db:
     """
     Opens/creates a database file, and provides an API for executing *Queries*
