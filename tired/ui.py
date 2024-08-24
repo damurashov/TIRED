@@ -12,6 +12,20 @@ def select(options, title="", optimize_obvious_selection=True, option_shortcuts=
 
     return simple_term_menu.TerminalMenu(options, title=title).show()
 
+def multiselect(options, title="", option_shortcuts=None):
+    if option_shortcuts is not None and len(option_shortcuts) == len(options):
+        options = list(map(lambda i: f'[{i[0]}] {i[1]}' if len(i[0]) else i[1], zip(option_shortcuts, options)))
+
+    import simple_term_menu
+
+    if option_shortcuts is not None and len(option_shortcuts) == len(options):
+        options = list(map(lambda i: f'[{i[0]}] {i[1]}' if len(i[0]) else i[1], zip(option_shortcuts, options)))
+
+    try:
+        return simple_term_menu.TerminalMenu(options, title=title, multi_select=True, show_multi_select_hint=True).show()
+    except KeyboardInterrupt as e:
+        return tuple()
+
 
 def select_yn(title="") -> bool:
     selected_option_id = select(["[n]No", "[y]Yes"], title)
@@ -77,4 +91,3 @@ def print_table_line(content, widths=None):
     fmt = ''.join(map(lambda i: f'{{:<{i}}}', widths))
 
     print(fmt.format(*content))
-
