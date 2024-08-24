@@ -29,6 +29,6 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.7",
-    version="0.9.0",
+    version="0.12.1",
 )
 
