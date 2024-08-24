@@ -12,7 +12,10 @@ def select(options, title="", optimize_obvious_selection=True, option_shortcuts=
 
     return simple_term_menu.TerminalMenu(options, title=title).show()
 
-def multiselect(options, title="", option_shortcuts=None):
+def multiselect(options, title="", option_shortcuts=None, preselected_entries=list()):
+    """ preselected_items -- list of int or str, may be mixed """
+    preselected_entries = list(map(lambda i: preselected_entries.index(i) if type(i) is str else i, preselected_entries))
+
     if option_shortcuts is not None and len(option_shortcuts) == len(options):
         options = list(map(lambda i: f'[{i[0]}] {i[1]}' if len(i[0]) else i[1], zip(option_shortcuts, options)))
 
@@ -22,7 +25,8 @@ def multiselect(options, title="", option_shortcuts=None):
         options = list(map(lambda i: f'[{i[0]}] {i[1]}' if len(i[0]) else i[1], zip(option_shortcuts, options)))
 
     try:
-        return simple_term_menu.TerminalMenu(options, title=title, multi_select=True, show_multi_select_hint=True).show()
+        return simple_term_menu.TerminalMenu(options, title=title, multi_select=True, show_multi_select_hint=True,
+                multi_select_select_on_accept=False, preselected_entries=preselected_entries).show()
     except KeyboardInterrupt as e:
         return tuple()
 
