@@ -14,7 +14,8 @@ def select(options, title="", optimize_obvious_selection=True, option_shortcuts=
 
 def multiselect(options, title="", option_shortcuts=None, preselected_entries=list()):
     """ preselected_items -- list of int or str, may be mixed """
-    preselected_entries = list(map(lambda i: preselected_entries.index(i) if type(i) is str else i, preselected_entries))
+    preselected_entries = list(map(lambda i: options.index(i) if type(i) is str else i, preselected_entries))
+    print("preselected", preselected_entries)
 
     if option_shortcuts is not None and len(option_shortcuts) == len(options):
         options = list(map(lambda i: f'[{i[0]}] {i[1]}' if len(i[0]) else i[1], zip(option_shortcuts, options)))
