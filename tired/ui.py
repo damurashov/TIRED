@@ -26,7 +26,8 @@ def multiselect(options, title="", option_shortcuts=None, preselected_entries=li
 
     try:
         return simple_term_menu.TerminalMenu(options, title=title, multi_select=True, show_multi_select_hint=True,
-                multi_select_select_on_accept=False, preselected_entries=preselected_entries).show()
+                multi_select_select_on_accept=False, preselected_entries=preselected_entries,
+                multi_select_empty_ok=True).show()
     except KeyboardInterrupt as e:
         return tuple()
 
