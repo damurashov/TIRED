@@ -1,3 +1,6 @@
+import tired.logging
+
+
 def select(options, title="", optimize_obvious_selection=True, option_shortcuts=None):
     """
     Shortcuts are one-letter hotkeys
@@ -36,6 +39,22 @@ def select_yn(title="") -> bool:
     selected_option_id = select(["[n]No", "[y]Yes"], title)
 
     return bool(selected_option_id)  # bool hack: 0 and 1 match False and True
+
+
+def cli_input(prompt="> ", itype=str, default=None):
+    if len(prompt) and default is not None:
+        prompt = f'(empty for {default})' + prompt
+    while True:
+        try:
+            i = input(prompt).strip()
+            if not len(i):
+                if default is not None:
+                    return itype(default)
+                continue
+            res = itype(i)
+            return res
+        except Exception as e:
+            tired.logging.error(f'Error: "{e}"')
 
 
 def get_input_using_temporary_file(file_path=".tmp", editor="vim", initial_message="", force_rewrite_initial_message=True):
