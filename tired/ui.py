@@ -1,4 +1,20 @@
+import os
+import pathlib
 import tired.logging
+
+
+def envvar(name, default=None, type_=str, required=False, help: str=""):
+    var = None
+    if name in os.environ:
+        var = type_(os.environ[name])
+        tired.logging.info(f"Env. variable {name}: {type_.__name__} ({help}) ={var}")
+    elif required:
+        tired.logging.error(f"NOT FOUND, required env. variable {name}: {type_.__name__} ({help})!")
+        exit(1)
+    else:
+        var = default
+        tired.logging.warning(f"NOT FOUND, env. variable {name}: {type_.__name__} ({help}), using default {name}={var}")
+    return var
 
 
 def select(options, title="", optimize_obvious_selection=True, option_shortcuts=None):
