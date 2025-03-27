@@ -3,7 +3,20 @@ import pathlib
 import tired.logging
 
 
+__envvars = set()
+
+
+def used_envvars():
+    """
+    Returns envvars used by the program (i.e. whose values were
+    queried through "envvar"), along w/ their values
+    """
+    return {k: os.environ[k] for k in __envvars if k in os.environ}
+
+
 def envvar(name, default=None, type_=str, required=False, help: str=""):
+    global __envvars
+    __envvars.update([name])
     var = None
     if name in os.environ:
         var = type_(os.environ[name])
