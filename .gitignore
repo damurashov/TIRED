@@ -12,3 +12,4 @@ tired.egg-info
 *.swp
 build/
 .eggs
+.commitmsg
